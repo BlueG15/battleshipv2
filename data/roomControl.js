@@ -7,7 +7,7 @@ let roomController = {}
 
 roomController.bootstrap = () => new Promise(async (resolve, reject) => {
   await db.transac([
-    `DROP TABLE IF EXISTS contacts;`,
+    `DROP TABLE IF EXISTS rooms;`,
     `CREATE TABLE IF NOT EXISTS rooms (
         roomID VARCHAR(7) PRIMARY KEY,
         p1ID VARCHAR(20),
@@ -56,7 +56,13 @@ roomController.getRoomData = (roomID) => new Promise( async (resolve, reject) =>
 })
 
 roomController.createRoom = (playerID, playerName) => new Promise( async (resolve, reject) => {
-  const roomID = generateRandomID(6)
+  const exist = await db.query(`SELECT roomID FROM rooms`)
+  let roomID = generateRandomID(6)
+  let count = 0
+  while (exist.includes(roomID) && count < 50){
+    roomID = generateRandomID(6)
+    count++
+  }
   await db.query(`
     INSERT INTO rooms (roomID, p1ID, p1Name) VALUES ('${roomID}', '${playerID}', '${playerName}');
   `)
@@ -95,6 +101,8 @@ roomController.addSpectator = (playerID, roomID) => new Promise( async (resolve,
 })
 
 roomController.removeFromRoom = (playerID, roomID) => new Promise( async (resolve, reject) => {
+  //note to self: invoke gameControl to delete the room table
+
   //if player 1 is removed, room is deleted
   var roomData = await roomController.getRoomData(roomID)
   if(!roomData.length) resolve(new defRes(true, 'addToRoom', playerID, 'room not exist'))
@@ -102,7 +110,10 @@ roomController.removeFromRoom = (playerID, roomID) => new Promise( async (resolv
   case roomData[1] :  { //player is player 1
 
       //inform spectators that room closed
-      await db.query(`DELETE FROM rooms WHERE roomID = '${roomID}'`)
+      await db.transac([
+        `DELETE FROM rooms WHERE roomID = '${roomID}'`,
+        `DROP TABLE IF EXISTS ${roomID}`
+      ])
       resolve(new defRes(false, 'removeFromRoom', playerID, `the host left the room, successfully deleted room ${roomID}`, {'oldRoomData' : roomData}))
       break;
     } 
