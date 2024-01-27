@@ -22,7 +22,7 @@ roomController.bootstrap = () => new Promise(async (resolve, reject) => {
         p4ID VARCHAR(20)
     );`
   ]); //p3 and p4 are spectators
-  resolve(0)
+  return resolve(0)
 })
 
 function rng(min, max, round){
@@ -56,7 +56,7 @@ function generateRandomID(length = 6) {
 
 roomController.getRoomData = (roomID) => new Promise( async (resolve, reject) => {
   const res = await db.query(`SELECT * FROM rooms WHERE roomID = '${roomID}'`)
-  resolve(res[0]) //object, empty if nothing found
+  return resolve(res[0]) //object, empty if nothing found
 })
 
 roomController.createRoom = (playerID, playerName) => new Promise( async (resolve, reject) => {
@@ -71,7 +71,7 @@ roomController.createRoom = (playerID, playerName) => new Promise( async (resolv
   }
   if(exist.includes(roomID)){
     //fail to create room, data base full
-    resolve (new defRes(true, "createRoom", playerID, `Fail to create a new room, database full, considering restarting it, rooms should NOT last this long`), {"exist": exist})
+    return resolve (new defRes(true, "createRoom", playerID, `Fail to create a new room, database full, considering restarting it, rooms should NOT last this long`), {"exist": exist})
   }
   await db.query(`                                
     INSERT INTO rooms (roomID, p1ID, p1Name, p1Ready) VALUES ('${roomID}', '${playerID}', '${db.sanitizeString(playerName)}, false');
@@ -81,26 +81,26 @@ roomController.createRoom = (playerID, playerName) => new Promise( async (resolv
     'host' : true
   }
   //note to self: socket.send to playerID what this resolves
-  resolve(new defRes(false, 'createRoom', playerID, `player ${playerID} successfully created new room with roomID = ${roomID}`, res))
+  return resolve(new defRes(false, 'createRoom', playerID, `player ${playerID} successfully created new room with roomID = ${roomID}`, res))
 })
 
 roomController.addToRoom = (playerID, playerName, roomID) => new Promise( async (resolve, reject) => {
   //only adds the 2nd player as the 1st is added on room creation
   const roomData = await roomController.getRoomData(roomID)
-  if(!roomData) resolve(new defRes(true, 'addToRoom', playerID, 'room not exist'))
-  if(roomData['p2id']) resolve(new defRes(true, 'addToRoom', playerID, 'room full'))
+  if(!roomData) return resolve(new defRes(true, 'addToRoom', playerID, 'room not exist'));
+  if(roomData['p2id']) return resolve(new defRes(true, 'addToRoom', playerID, 'room full'))
   await db.transac([
     `UPDATE rooms SET p2ID = '${playerID}' WHERE roomID = '${roomID}';`,
     `UPDATE rooms SET p2Name = '${db.sanitizeString(playerName)}' WHERE roomID = '${roomID}';`,
     `UPDATE rooms SET p2Ready = false WHERE roomID = '${roomID}'`
   ])
-  resolve(new defRes(false, 'addToRoom', playerID, `successfully added player ${playerID} to room ${roomID} as player 2`, {}))
+  return resolve(new defRes(false, 'addToRoom', playerID, `successfully added player ${playerID} to room ${roomID} as player 2`, {}))
 }) 
 
 roomController.addSpectator = (playerID, roomID) => new Promise( async (resolve, reject) => {
   //only adds spectators
   const roomData = await roomController.getRoomData(roomID)
-  if(!roomData) resolve(new defRes(true, 'addToRoom', playerID, 'room not exist'))
+  if(!roomData) return resolve(new defRes(true, 'addToRoom', playerID, 'room not exist'))
   if(roomData['p3id']) {
 
     if(!roomData['p4id']){
@@ -108,14 +108,14 @@ roomController.addSpectator = (playerID, roomID) => new Promise( async (resolve,
       var player = 2  
     } else {
       //out of spectator slots
-      resolve (new defRes(true, "addSpectator", playerID, `failed to add player ${playerID} to room ${roomID} due to full spectator slots`, {}))
+      return resolve (new defRes(true, "addSpectator", playerID, `failed to add player ${playerID} to room ${roomID} due to full spectator slots`, {}))
     }
 
   } else {
     await db.query(`UPDATE rooms SET p3ID = '${playerID}' WHERE roomID = '${roomID}'`)
     var player = 1
   }
-  resolve(new defRes(false, 'addToRoom', playerID, `successfully added player ${playerID} to room ${roomID} as spectator number ${player}`, {"roomData" : roomData}))
+  return resolve(new defRes(false, 'addToRoom', playerID, `successfully added player ${playerID} to room ${roomID} as spectator number ${player}`, {"roomData" : roomData}))
 })
 
 roomController.removeFromRoom = (playerID, roomID) => new Promise( async (resolve, reject) => {
@@ -132,16 +132,14 @@ roomController.removeFromRoom = (playerID, roomID) => new Promise( async (resolv
         `DELETE FROM rooms WHERE roomID = '${roomID}'`,
         `DROP TABLE IF EXISTS ${roomID}`
       ])
-      resolve(new defRes(false, 'removeFromRoom', playerID, `the host left the room, successfully deleted room ${roomID}`, {'oldRoomData' : roomData}))
-      break;
+      return resolve(new defRes(false, 'removeFromRoom', playerID, `the host left the room, successfully deleted room ${roomID}`, {'oldRoomData' : roomData}))
     } 
   case roomData['p2id'] : {
       //player is player 2
 
       //note to self: inform player 1 and spectators that player 2 left after invoking this function
       await db.query(`UPDATE rooms SET p2ID = NULL WHERE roomID = '${roomID}'`)
-      resolve(new defRes(false, 'removeFromRoom', playerID, `player 2 left the room successfully in room ${roomID}`, {}))
-      break;
+      return resolve(new defRes(false, 'removeFromRoom', playerID, `player 2 left the room successfully in room ${roomID}`, {}))
     }
   case roomData['p3id'] : {
     //player 3 is a spectator
@@ -154,18 +152,15 @@ roomController.removeFromRoom = (playerID, roomID) => new Promise( async (resolv
     } else {
       await db.query(`UPDATE rooms SET p3ID = NULL WHERE roomID = '${roomID}'`)
     }
-    resolve(new defRes(false, 'removeFromRoom', playerID, `spectator 1 left in room ${roomID}`, {}))
-    break;
+    return resolve(new defRes(false, 'removeFromRoom', playerID, `spectator 1 left in room ${roomID}`, {}))
   }
   case roomData['p4id'] : {
     //player 4 is a spectator
     await db.query(`UPDATE rooms SET p4ID = NULL WHERE roomID = '${roomID}'`)
-    resolve(new defRes(false, 'removeFromRoom', playerID, `spectator 2 left in room ${roomID}`, {}))
-    break;
+    return resolve(new defRes(false, 'removeFromRoom', playerID, `spectator 2 left in room ${roomID}`, {}))
   }
   default : {
-    resolve(new defRes(true, 'removeFromRoom', playerID, `playerID not exist in room ${roomID}`, {'roomData' : roomData}))
-    break;
+    return resolve(new defRes(true, 'removeFromRoom', playerID, `playerID not exist in room ${roomID}`, {'roomData' : roomData}))
   }
   }
 })
@@ -179,21 +174,21 @@ roomController.setReady = (playerID, roomID, isReady) => new Promise( async (res
     if(isReady && roomData['p2Ready']){
       //both player ready, initiate game
       await gameController.startGame(roomID)
-      resolve( new defRes(false, "setReady", playerID, `both player set status as ready in room ${roomID}, game started`) )
+      return resolve( new defRes(false, "setReady", playerID, `both player set status as ready in room ${roomID}, game started`) )
     }
-    resolve( new defRes(false, "setReady", playerID, `player ${playerID} successfully set ready status as ${isReady} in room ${roomID}`) )
+    return resolve( new defRes(false, "setReady", playerID, `player ${playerID} successfully set ready status as ${isReady} in room ${roomID}`) )
   } else if(roomData['p2id'] == playerID){
     //player is player 2
     await db.query(`UPDATE rooms SET p2Ready = ${isReady} WHERE roomID = '${roomID}';`)
     if(isReady && roomData['p1Ready']){
       //both player ready, initiate game
       await gameController.startGame(roomID)
-      resolve( new defRes(false, "setReady", playerID, `both player set status as ready in room ${roomID}, game started`) )
+      return resolve( new defRes(false, "setReady", playerID, `both player set status as ready in room ${roomID}, game started`) )
     }
-    resolve( new defRes(false, "setReady", playerID, `player ${playerID} successfully set ready status as ${isReady} in room ${roomID}`) )
+    return resolve( new defRes(false, "setReady", playerID, `player ${playerID} successfully set ready status as ${isReady} in room ${roomID}`) )
   } else {
     //player not belong to this room
-    resolve( new defRes(true, "setReady", playerID, `player ${playerID} is not in room ${roomID}`) )
+    return resolve( new defRes(true, "setReady", playerID, `player ${playerID} is not in room ${roomID}`) )
   }
 })
 
