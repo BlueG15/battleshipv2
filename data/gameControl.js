@@ -53,7 +53,7 @@ class gameObj {
   `}
 } 
 
-let gammeController = {}
+let gameController = {}
 
 gameController.startGame = (roomID) => new Promise(async (resolve, reject) => {
     await db.transac([ 
