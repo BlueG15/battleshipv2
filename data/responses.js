@@ -5,6 +5,7 @@ class response  {
         case false : {
                 console.log(note)
                 this.fail = false
+                this.note = note
                 this.event = event
                 this.timeStamp = time
                 this.data = data
