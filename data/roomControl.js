@@ -52,7 +52,7 @@ function generateRandomID(length = 6) {
 
 roomController.getRoomData = (roomID) => new Promise( async (resolve, reject) => {
   const res = await db.query(`SELECT * FROM rooms WHERE roomID = '${roomID}'`)
-  return res //array, empty if nothing found
+  resolve(res) //array, empty if nothing found
 })
 
 roomController.createRoom = (playerID, playerName) => new Promise( async (resolve, reject) => {
