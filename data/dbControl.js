@@ -58,7 +58,7 @@ databaseController.transac = async (queryArr) => {
         await client.query('COMMIT')
     }catch(e){
         await client.query('ROLLBACK')
-        console.error(e)
+        console.error(`executed query: \n ${text} \n with errors: \n ${e} \n`)
         return []
     } finally {
         client.release()
