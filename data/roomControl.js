@@ -21,7 +21,10 @@ roomController.bootstrap = () => new Promise(async (resolve, reject) => {
   resolve(0)
 })
 
-function rng(max, min, round){
+function rng(min, max, round){
+  if (max < min) {
+    [max, min] = [min, max]; // Swap values if max is less than min
+  }
   return (round) ? Math.round(Math.random() * (max - min) + min) : Math.random() * (max - min) + min
 }
 
@@ -32,9 +35,11 @@ function generateRandomID(length = 6) {
   }
 
   const characters =
-    'ABCDEFGHJKMNOPQRSTUVWXYZabcdefghjkmnopqrstuvwxyz01234567890';
+    'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz123456789'; //removed I, i, L, l, 0, O and o to avoid confusion
   var randomMap = new Array(length)
-  randomMap.forEach((i, index) => {i = (index == 0) ? rng(0, length - 11, true) : rng(0, length - 1, true)})
+  for (let i = 0; i < length; i++) {
+    randomMap[i] = (i == 0) ? rng(0, characters.length - 10, true) : rng(0, characters.length - 1, true)
+  }
   const charArr = [];
 
   for (let i = 0; i < length; i++) {
