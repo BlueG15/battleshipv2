@@ -90,8 +90,8 @@ databaseController.transac = async (queryArr) => {
 databaseController.sanitizeString = (str) => {
     if(!str || !str.length) return "unknownPlayer"
     const reg = new RegExp(/(\W)+|SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|AND|OR|CREATE|ALTER|DROP|TABLE|DATABASE|BEGIN|COMMIT|ROLLBACK/gim)
-    str.replace(reg, "")
-    if(!str || !str.length) return "unknownPlayer"
+    str = str.replace(reg, "")
+    return (!str || !str.length) ? "unknownPlayer" : str
 }
 
 module.exports = databaseController

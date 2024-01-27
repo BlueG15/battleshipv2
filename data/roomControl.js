@@ -74,7 +74,7 @@ roomController.createRoom = (playerID, playerName) => new Promise( async (resolv
     return resolve (new defRes(true, "createRoom", playerID, `Fail to create a new room, database full, considering restarting it, rooms should NOT last this long`), {"exist": exist})
   }
   await db.query(`                                
-    INSERT INTO rooms (roomID, p1ID, p1Name, p1Ready) VALUES ('${roomID}', '${playerID}', '${db.sanitizeString(playerName)}, false');
+    INSERT INTO rooms (roomID, p1ID, p1Name, p1Ready) VALUES ('${roomID}', '${playerID}', '${db.sanitizeString(playerName)}', false);
   `)
   const res = {
     'roomID' : roomID,
