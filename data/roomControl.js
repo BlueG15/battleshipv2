@@ -171,7 +171,7 @@ roomController.setReady = (playerID, roomID, isReady) => new Promise( async (res
   if(roomData['p1id'] == playerID){
     //player is player 1
     await db.query(`UPDATE rooms SET p1Ready = ${isReady} WHERE roomID = '${roomID}';`)
-    if(isReady && roomData['p2Ready']){
+    if(isReady && roomData['p2ready']){
       //both player ready, initiate game
       await gameController.startGame(roomID)
       return resolve( new defRes(false, "setReady", playerID, `both player set status as ready in room ${roomID}, game started`) )
@@ -180,7 +180,7 @@ roomController.setReady = (playerID, roomID, isReady) => new Promise( async (res
   } else if(roomData['p2id'] == playerID){
     //player is player 2
     await db.query(`UPDATE rooms SET p2Ready = ${isReady} WHERE roomID = '${roomID}';`)
-    if(isReady && roomData['p1Ready']){
+    if(isReady && roomData['p1ready']){
       //both player ready, initiate game
       await gameController.startGame(roomID)
       return resolve( new defRes(false, "setReady", playerID, `both player set status as ready in room ${roomID}, game started`) )
