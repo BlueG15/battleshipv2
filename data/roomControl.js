@@ -84,7 +84,7 @@ roomController.addToRoom = (playerID, playerName, roomID) => new Promise( async 
   //only adds the 2nd player as the 1st is added on room creation
   const roomData = await roomController.getRoomData(roomID)
   if(!roomData) resolve(new defRes(true, 'addToRoom', playerID, 'room not exist'))
-  if(roomData['p2ID']) resolve(new defRes(true, 'addToRoom', playerID, 'room full'))
+  if(roomData['p2id']) resolve(new defRes(true, 'addToRoom', playerID, 'room full'))
   await db.transac([
     `UPDATE rooms SET p2ID = '${playerID}' WHERE roomID = '${roomID}';`,
     `UPDATE rooms SET p2Name = '${playerName}' WHERE roomID = '${roomID}';`
@@ -96,7 +96,7 @@ roomController.addSpectator = (playerID, roomID) => new Promise( async (resolve,
   //only adds spectators
   const roomData = await roomController.getRoomData(roomID)
   if(!roomData) resolve(new defRes(true, 'addToRoom', playerID, 'room not exist'))
-  if(roomData['p3ID']) {
+  if(roomData['p3id']) {
     await db.query(`UPDATE rooms SET p4ID = '${playerID}' WHERE roomID = '${roomID}'`)
     var player = 2  
   } else {
@@ -113,7 +113,7 @@ roomController.removeFromRoom = (playerID, roomID) => new Promise( async (resolv
   var roomData = await roomController.getRoomData(roomID)
   if(!roomData) resolve(new defRes(true, 'addToRoom', playerID, 'room not exist'))
   switch(playerID){
-  case roomData['p1ID'] :  { //player is player 1
+  case roomData['p1id'] :  { //player is player 1
 
       //inform spectators that room closed
       await db.transac([
@@ -123,7 +123,7 @@ roomController.removeFromRoom = (playerID, roomID) => new Promise( async (resolv
       resolve(new defRes(false, 'removeFromRoom', playerID, `the host left the room, successfully deleted room ${roomID}`, {'oldRoomData' : roomData}))
       break;
     } 
-  case roomData['p2ID'] : {
+  case roomData['p2id'] : {
       //player is player 2
 
       //note to self: inform player 1 and spectators that player 2 left after invoking this function
@@ -131,11 +131,11 @@ roomController.removeFromRoom = (playerID, roomID) => new Promise( async (resolv
       resolve(new defRes(false, 'removeFromRoom', playerID, `player 2 left the room successfully in room ${roomID}`, {}))
       break;
     }
-  case roomData['p3ID'] : {
+  case roomData['p3id'] : {
     //player 3 is a spectator
     //move player 4 into player 1 if player 4 exist
 
-    if(roomData['p4ID']){
+    if(roomData['p4id']){
       await db.transac([
         `UPDATE rooms SET p3ID = '${roomData[4]}' WHERE roomID = '${roomID}'`,
         `UPDATE rooms SET p4ID = NULL WHERE roomID = '${roomID}'`
@@ -146,7 +146,7 @@ roomController.removeFromRoom = (playerID, roomID) => new Promise( async (resolv
     resolve(new defRes(false, 'removeFromRoom', playerID, `spectator 1 left in room ${roomID}`, {}))
     break;
   }
-  case roomData['p4ID'] : {
+  case roomData['p4id'] : {
     //player 4 is a spectator
     await db.query(`UPDATE rooms SET p4ID = NULL WHERE roomID = '${roomID}'`)
     resolve(new defRes(false, 'removeFromRoom', playerID, `spectator 2 left in room ${roomID}`, {}))

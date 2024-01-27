@@ -6,6 +6,7 @@ const pool = new pg.Pool({
 
 let databaseController = {}
 
+//note: property name gets lowercased when fetched
 
 //for 1 sqls, return the row array
 databaseController.query = async (text, params) => {
