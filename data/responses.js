@@ -4,19 +4,19 @@ class response  {
         switch(fail) {
         case false : {
                 console.log(note)
-                self.fail = false
-                self.event = event
-                self.timeStamp = time
-                self.data = data
+                this.fail = false
+                this.event = event
+                this.timeStamp = time
+                this.data = data
                 break
             } 
         default : {
                 console.log(`player ${player} caused an error: ${note} on ${time} in event ${event}`)
-                self.fail = true
-                self.note = note
-                self.event= event
-                self.timeStamp = time
-                self.data = {} 
+                this.fail = true
+                this.note = note
+                this.event= event
+                this.timeStamp = time
+                this.data = {} 
                 break
             }  
         }

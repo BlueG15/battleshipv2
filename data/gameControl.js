@@ -5,27 +5,27 @@ const defRes = require("./responses.js")
 
 class shipObj {
   constructor(shipID, pos, rot){
-    self.shipID = shipID ?? "NULL" //string length 10
-    self.pos = (pos && pos.length == 2) ? pos : [-1, -1]//array of int
-    self.rot = rot ?? -1//int
+    this.shipID = shipID ?? "NULL" //string length 10
+    this.pos = (pos && pos.length == 2) ? pos : [-1, -1]//array of int
+    this.rot = rot ?? -1//int
   }
 
   convertToSQL(){
-    return `ROW('${self.shipID}', ARRAY[${self.pos.join(", ")}], ${self.rot}),`
+    return `ROW('${this.shipID}', ARRAY[${this.pos.join(", ")}], ${this.rot}),`
   }
 }
 
 class playerObj {
   constructor(isTurn, energy, shipObjArray){
-    self.isTurn = isTurn ?? false //boolean
-    self.energy = energy ?? -1 //int
-    self.shipObjArray = shipObjArray ?? new shipObj() //ship object
+    this.isTurn = isTurn ?? false //boolean
+    this.energy = energy ?? -1 //int
+    this.shipObjArray = shipObjArray ?? new shipObj() //ship object
   }
 
   convertToSQL() {
     return `
-    ${self.isTurn},
-    ${self.energy},
+    ${this.isTurn},
+    ${this.energy},
     ARRAY[
       ${shipObjArray.map(i => i.convertToSQL()).join(" \n")}
     ]::SHIPOBJ[]);
@@ -35,21 +35,21 @@ class playerObj {
 
 class gameObj {
   constructor(roomID, mode, p1Obj, p2Obj, turnCount, phase){
-    self.roomID = roomID ?? "NULL", //string length 6
-    self.mode = mode ?? -1, //INT
-    self.p1Obj = p1Obj ?? new playerObj() //player object
-    self.p2Obj = p2Obj ?? new playerObj()//player object
-    self.turnCount = turnCount ?? -1 //INT
-    self.phase = phase ?? -1 //INT
+    this.roomID = roomID ?? "NULL", //string length 6
+    this.mode = mode ?? -1, //INT
+    this.p1Obj = p1Obj ?? new playerObj() //player object
+    this.p2Obj = p2Obj ?? new playerObj()//player object
+    this.turnCount = turnCount ?? -1 //INT
+    this.phase = phase ?? -1 //INT
   }
     
   convertToSQL() {return `
-    '${self.roomID ?? ""}',
-    ${self.mode ?? -1},
-    ${self.p1Obj.convertToSQL()}::PLAYEROBJ,
-    ${self.p2Obj.convertToSQL()}::PLAYEROBJ,
-    ${self.turnCount},
-    ${self.phase}
+    '${this.roomID ?? ""}',
+    ${this.mode ?? -1},
+    ${this.p1Obj.convertToSQL()}::PLAYEROBJ,
+    ${this.p2Obj.convertToSQL()}::PLAYEROBJ,
+    ${this.turnCount},
+    ${this.phase}
   `}
 } 
 
