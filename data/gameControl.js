@@ -58,24 +58,24 @@ let gameController = {}
 gameController.startGame = (roomID) => new Promise(async (resolve, reject) => {
     await db.transac([ 
         `CREATE TYPE IF NOT EXISTS SHIPOBJ AS (
-          shipID : VARCHAR(10),
-          pos : SMALLINT[2],
-          rot : SMALLINT,
+          shipID VARCHAR(10),
+          pos SMALLINT[2],
+          rot SMALLINT,
         )`,
       
         `CREATE TYPE IF NOT EXISTS PLAYEROBJ AS (
-          isTurn : BOOLEAN,
-          energy : SMALLINT,
-          shipObj : SHIPOBJ[5],
+          isTurn BOOLEAN,
+          energy SMALLINT,
+          shipObj SHIPOBJ[5],
         )`,
 
         `CREATE TABLE ${roomID} (
-          roomID : VARCHAR(7) PRIMARY KEY,
-          mode : SMALLINT,
-          p1Obj : PLAYEROBJ,
-          p2Obj : PLAYEROBJ,
-          turnCount : SMALLINT,
-          phase : SMALLINT,
+          roomID VARCHAR(7) PRIMARY KEY,
+          mode SMALLINT,
+          p1Obj PLAYEROBJ,
+          p2Obj PLAYEROBJ,
+          turnCount SMALLINT,
+          phase SMALLINT,
         )`,
 
         `INSERT INTO ${roomID} (roomID, mode, p1Obj, p2Obj, turnCount, phase)
