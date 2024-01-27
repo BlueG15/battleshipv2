@@ -7,8 +7,8 @@ let roomController = {}
 
 roomController.bootstrap = () => new Promise(async (resolve, reject) => {
   await db.transac([
-    `DELETE IF EXIST contacts `,
-    `CREATE TABLE IF NOT EXIST rooms (
+    `DROP TABLE IF EXISTS contacts;`,
+    `CREATE TABLE IF NOT EXISTS rooms (
         roomID VARCHAR(7) PRIMARY KEY,
         p1ID VARCHAR(20),
         p1Name VARCHAR(16),
