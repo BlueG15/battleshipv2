@@ -72,13 +72,13 @@ async function main(){
 
   express.get("/ready/:roomID", async (req, res) => {
     let roomID = req.params.roomID
-    let a = await roomController.setReady(defTestPlayerID1, roomID)
+    let a = await roomController.setReady(defTestPlayerID1, roomID, true)
     res.send(JSON.stringify(a, null, 4))
   })
 
   express.get("/ready1/:roomID", async (req, res) => {
     let roomID = req.params.roomID
-    let a = await roomController.setReady(defTestPlayerID2, roomID)
+    let a = await roomController.setReady(defTestPlayerID2, roomID, true)
     res.send(JSON.stringify(a, null, 4))
   })
 
