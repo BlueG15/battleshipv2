@@ -57,6 +57,7 @@ roomController.getRoomData = (roomID) => new Promise( async (resolve, reject) =>
 
 roomController.createRoom = (playerID, playerName) => new Promise( async (resolve, reject) => {
   const exist = await db.query(`SELECT roomID FROM rooms`)
+  resolve(JSON.stringify(exist))
   let roomID = generateRandomID(6)
   let count = 0
   while (exist.includes(roomID) && count < 50){
