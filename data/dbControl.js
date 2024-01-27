@@ -74,7 +74,12 @@ databaseController.transac = async (queryArr) => {
     try{
         await client.query('BEGIN')
         queryArr.forEach(async i => {
-            await client.query(i)
+            try{
+                await client.query(i)
+            }catch(e){
+                console.log(i)
+                throw e
+            }
         });
         await client.query('COMMIT')
     }catch(e){
