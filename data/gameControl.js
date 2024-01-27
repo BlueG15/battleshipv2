@@ -16,7 +16,7 @@ class shipObj {
 }
 
 class playerObj {
-  constructor(name, isTurn, energy, shipObjArray){
+  constructor(isTurn, energy, shipObjArray){
     this.isTurn = isTurn ?? false //boolean
     this.energy = energy ?? -1 //int
     this.shipObjArray = shipObjArray ?? new Array(5).fill(new shipObj()) //ship object
@@ -27,7 +27,7 @@ class playerObj {
     ${this.isTurn},
     ${this.energy},
     ARRAY[
-      ${shipObjArray.map(i => i.convertToSQL()).join(" \n")}
+      ${this.shipObjArray.map(i => i.convertToSQL()).join(" ")}
     ]::SHIPOBJ[]);
     `
   }
