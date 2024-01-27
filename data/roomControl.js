@@ -9,7 +9,7 @@ roomController.bootstrap = () => new Promise(async (resolve, reject) => {
   await db.transac([
     `DROP TABLE IF EXISTS rooms;`,
     `CREATE TABLE IF NOT EXISTS rooms (
-        roomID VARCHAR(7) PRIMARY KEY,
+        roomID VARCHAR(10) PRIMARY KEY,
         p1ID VARCHAR(20),
         p1Name VARCHAR(16),
         p2ID VARCHAR(20),
@@ -57,14 +57,19 @@ roomController.getRoomData = (roomID) => new Promise( async (resolve, reject) =>
 
 roomController.createRoom = (playerID, playerName) => new Promise( async (resolve, reject) => {
   const exist = await db.query(`SELECT roomID FROM rooms`)
-  resolve(JSON.stringify(exist))
-  let roomID = generateRandomID(6)
+  let len = 5
+  let roomID = generateRandomID(5)
   let count = 0
-  while (exist.includes(roomID) && count < 50){
-    roomID = generateRandomID(6)
+  while (exist.includes(roomID) && count < 300){
+    roomID = generateRandomID(len)
+    len += Math.floor(count / 50)
     count++
   }
-  await db.query(`
+  if(exist.includes(roomID)){
+    //fail to create room, data base full
+    resolve (new defRes(true, "createRoom", playerID, `Fail to create a new room, database full, considering restarting it, rooms should NOT last this long`), {"exist": exist})
+  }
+  await db.query(`                                
     INSERT INTO rooms (roomID, p1ID, p1Name) VALUES ('${roomID}', '${playerID}', '${playerName}');
   `)
   const res = {
