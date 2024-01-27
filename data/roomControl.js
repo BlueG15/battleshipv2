@@ -7,7 +7,6 @@ let roomController = {}
 
 roomController.bootstrap = () => new Promise(async (resolve, reject) => {
   await db.transac([
-    `DELETE *`,
     `CREATE TABLE rooms (
         roomID VARCHAR(7) PRIMARY KEY,
         p1ID VARCHAR(20),
