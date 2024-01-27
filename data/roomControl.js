@@ -12,7 +12,7 @@ roomController.bootstrap = () => new Promise(async (resolve, reject) => {
         p1ID VARCHAR(20),
         p1Name VARCHAR(16),
         p2ID VARCHAR(20),
-        p2Name VARCHAR(16)
+        p2Name VARCHAR(16),
         p3ID VARCHAR(20),
         p4ID VARCHAR(20)
     );`
