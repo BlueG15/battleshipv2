@@ -60,14 +60,14 @@ gameController.startGame = (roomID) => new Promise(async (resolve, reject) => {
         `CREATE TYPE IF NOT EXISTS SHIPOBJ AS (
           shipID VARCHAR(10),
           pos SMALLINT[2],
-          rot SMALLINT,
-        )`,
+          rot SMALLINT
+        );`,
       
         `CREATE TYPE IF NOT EXISTS PLAYEROBJ AS (
           isTurn BOOLEAN,
           energy SMALLINT,
-          shipObj SHIPOBJ[5],
-        )`,
+          shipObj SHIPOBJ[5]
+        );`,
 
         `CREATE TABLE ${roomID} (
           roomID VARCHAR(7) PRIMARY KEY,
@@ -75,15 +75,10 @@ gameController.startGame = (roomID) => new Promise(async (resolve, reject) => {
           p1Obj PLAYEROBJ,
           p2Obj PLAYEROBJ,
           turnCount SMALLINT,
-          phase SMALLINT,
-        )`,
-
-        `INSERT INTO ${roomID} (roomID, mode, p1Obj, p2Obj, turnCount, phase)
-        VALUES (
-            ${new gameObj(roomID, 0, new playerObj(), new playerObj(), undefined, undefined).convertToSQL()}
-        )`
+          phase SMALLINT
+        );`
     ]); 
-    resolve(0)
+    return resolve(0)
 })
 
 gameController.updatePlayer = async (playerID, isTurn, energy, shipObjArray) => {
