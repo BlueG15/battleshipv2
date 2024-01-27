@@ -31,7 +31,7 @@ async function main(){
   express.get("/roomData/:roomID", async (req, res) => {
     let roomID = req.params.roomID
     let a = await roomController.getRoomData(roomID)
-    res.send(a.p1ID + "\n\n" + JSON.stringify(a, null, 4))
+    res.send(JSON.stringify(a, null, 4))
   })
 
   express.get("/joinAsSpectator/:roomID", async (req, res) => {

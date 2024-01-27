@@ -97,8 +97,15 @@ roomController.addSpectator = (playerID, roomID) => new Promise( async (resolve,
   const roomData = await roomController.getRoomData(roomID)
   if(!roomData) resolve(new defRes(true, 'addToRoom', playerID, 'room not exist'))
   if(roomData['p3id']) {
-    await db.query(`UPDATE rooms SET p4ID = '${playerID}' WHERE roomID = '${roomID}'`)
-    var player = 2  
+
+    if(!roomData['p4id']){
+      await db.query(`UPDATE rooms SET p4ID = '${playerID}' WHERE roomID = '${roomID}'`)
+      var player = 2  
+    } else {
+      //out of spectator slots
+      resolve (new defRes(true, "addSpectator", playerID, `failed to add player ${playerID} to room ${roomID} due to full spectator slots`, {}))
+    }
+
   } else {
     await db.query(`UPDATE rooms SET p3ID = '${playerID}' WHERE roomID = '${roomID}'`)
     var player = 1
@@ -133,11 +140,10 @@ roomController.removeFromRoom = (playerID, roomID) => new Promise( async (resolv
     }
   case roomData['p3id'] : {
     //player 3 is a spectator
-    //move player 4 into player 1 if player 4 exist
 
     if(roomData['p4id']){
       await db.transac([
-        `UPDATE rooms SET p3ID = '${roomData[4]}' WHERE roomID = '${roomID}'`,
+        `UPDATE rooms SET p3ID = '${roomData['p4id']}' WHERE roomID = '${roomID}'`,
         `UPDATE rooms SET p4ID = NULL WHERE roomID = '${roomID}'`
       ])
     } else {
