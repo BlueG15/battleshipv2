@@ -85,10 +85,10 @@ roomController.addToRoom = (playerID, playerName, roomID) => new Promise( async 
   const roomData = await roomController.getRoomData(roomID)
   if(!roomData.length) resolve(new defRes(true, 'addToRoom', playerID, 'room not exist'))
   if(roomData[2]) resolve(new defRes(true, 'addToRoom', playerID, 'room full'))
-  await db.query(`
-    UPDATE rooms SET p2ID = '${playerID}' WHERE roomID = '${roomID}';
-    UPDATE rooms SET p2Name = '${playerName}' WHERE roomID = '${roomID}';
-  `)
+  await db.transac([
+    `UPDATE rooms SET p2ID = '${playerID}' WHERE roomID = '${roomID}';`,
+    `UPDATE rooms SET p2Name = '${playerName}' WHERE roomID = '${roomID}';`
+  ])
   resolve(new defRes(false, 'addToRoom', playerID, `successfully added player ${playerID} to room ${roomID} as player 2`, {}))
 }) 
 
