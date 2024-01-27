@@ -6,7 +6,7 @@ const db = require('./dbControl.js')
 let roomController = {}
 
 roomController.bootstrap = () => new Promise(async (resolve, reject) => {
-  await db.transac(
+  await db.transac([
     `DELETE *`,
     `CREATE TABLE rooms (
         roomID VARCHAR(7) PRIMARY KEY,
@@ -16,7 +16,8 @@ roomController.bootstrap = () => new Promise(async (resolve, reject) => {
         p2Name VARCHAR(16)
         p3ID VARCHAR(20),
         p4ID VARCHAR(20)
-    );`); //p3 and p4 are spectators
+    );`
+  ]); //p3 and p4 are spectators
   resolve(0)
 })
 
