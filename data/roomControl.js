@@ -1,7 +1,9 @@
 //const fs = require('fs');
+//fs can only read, not write
+
 const defRes = require('./responses.js')
 const db = require('./dbControl.js')
-//fs can only read, not write
+const gameController = require('./gameControl.js')
 
 let roomController = {}
 
@@ -11,9 +13,11 @@ roomController.bootstrap = () => new Promise(async (resolve, reject) => {
     `CREATE TABLE IF NOT EXISTS rooms (
         roomID VARCHAR(10) PRIMARY KEY,
         p1ID VARCHAR(20),
-        p1Name VARCHAR(16),
+        p1Name VARCHAR(20),
+        p1Ready BOOLEAN,
         p2ID VARCHAR(20),
-        p2Name VARCHAR(16),
+        p2Name VARCHAR(20),
+        p2Ready BOOLEAN,
         p3ID VARCHAR(20),
         p4ID VARCHAR(20)
     );`
@@ -70,7 +74,7 @@ roomController.createRoom = (playerID, playerName) => new Promise( async (resolv
     resolve (new defRes(true, "createRoom", playerID, `Fail to create a new room, database full, considering restarting it, rooms should NOT last this long`), {"exist": exist})
   }
   await db.query(`                                
-    INSERT INTO rooms (roomID, p1ID, p1Name) VALUES ('${roomID}', '${playerID}', '${playerName}');
+    INSERT INTO rooms (roomID, p1ID, p1Name, p1Ready) VALUES ('${roomID}', '${playerID}', '${db.sanitizeString(playerName)}, false');
   `)
   const res = {
     'roomID' : roomID,
@@ -87,7 +91,8 @@ roomController.addToRoom = (playerID, playerName, roomID) => new Promise( async 
   if(roomData['p2id']) resolve(new defRes(true, 'addToRoom', playerID, 'room full'))
   await db.transac([
     `UPDATE rooms SET p2ID = '${playerID}' WHERE roomID = '${roomID}';`,
-    `UPDATE rooms SET p2Name = '${playerName}' WHERE roomID = '${roomID}';`
+    `UPDATE rooms SET p2Name = '${db.sanitizeString(playerName)}' WHERE roomID = '${roomID}';`,
+    `UPDATE rooms SET p2Ready = false WHERE roomID = '${roomID}'`
   ])
   resolve(new defRes(false, 'addToRoom', playerID, `successfully added player ${playerID} to room ${roomID} as player 2`, {}))
 }) 
@@ -162,6 +167,33 @@ roomController.removeFromRoom = (playerID, roomID) => new Promise( async (resolv
     resolve(new defRes(true, 'removeFromRoom', playerID, `playerID not exist in room ${roomID}`, {'roomData' : roomData}))
     break;
   }
+  }
+})
+
+roomController.setReady = (playerID, roomID, isReady) => new Promise( async (resolve, reject) => {
+  const roomData = await roomController.getRoomData(roomID)
+  if(!roomData) resolve(new defRes(true, 'addToRoom', playerID, 'room not exist'))
+  if(roomData['p1id'] == playerID){
+    //player is player 1
+    await db.query(`UPDATE rooms SET p1Ready = ${isReady} WHERE roomID = '${roomID}';`)
+    if(isReady && roomData['p2Ready']){
+      //both player ready, initiate game
+      await gameController.startGame(roomID)
+      resolve( new defRes(false, "setReady", playerID, `both player set status as ready in room ${roomID}, game started`) )
+    }
+    resolve( new defRes(false, "setReady", playerID, `player ${playerID} successfully set ready status as ${isReady} in room ${roomID}`) )
+  } else if(roomData['p2id'] == playerID){
+    //player is player 2
+    await db.query(`UPDATE rooms SET p2Ready = ${isReady} WHERE roomID = '${roomID}';`)
+    if(isReady && roomData['p1Ready']){
+      //both player ready, initiate game
+      await gameController.startGame(roomID)
+      resolve( new defRes(false, "setReady", playerID, `both player set status as ready in room ${roomID}, game started`) )
+    }
+    resolve( new defRes(false, "setReady", playerID, `player ${playerID} successfully set ready status as ${isReady} in room ${roomID}`) )
+  } else {
+    //player not belong to this room
+    resolve( new defRes(true, "setReady", playerID, `player ${playerID} is not in room ${roomID}`) )
   }
 })
 

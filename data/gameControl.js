@@ -16,7 +16,7 @@ class shipObj {
 }
 
 class playerObj {
-  constructor(isTurn, energy, shipObjArray){
+  constructor(name, isTurn, energy, shipObjArray){
     this.isTurn = isTurn ?? false //boolean
     this.energy = energy ?? -1 //int
     this.shipObjArray = shipObjArray ?? new shipObj() //ship object
@@ -80,7 +80,7 @@ gameController.startGame = (roomID) => new Promise(async (resolve, reject) => {
 
         `INSERT INTO ${roomID} (roomID, mode, p1Obj, p2Obj, turnCount, phase)
         VALUES (
-            ${new gameObj(roomID, undefined, new playerObj(), new playerObj(), undefined, undefined).convertToSQL()}
+            ${new gameObj(roomID, 0, new playerObj(), new playerObj(), undefined, undefined).convertToSQL()}
         )`
     ]); 
     resolve(0)
@@ -104,3 +104,5 @@ gameController.updatePlayer = async (playerID, isTurn, energy, shipObjArray) => 
   if(!player || !player.length) player = 2; else player = 1 
   await db.query(`UPDATE ${roomID} SET p${player}Obj = ${new playerObj(isTurn, energy, shipObjArray).convertToSQL()} WHERE roomID = ${roomID}`)
 }
+
+module.exports = gameController
