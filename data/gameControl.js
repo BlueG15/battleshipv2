@@ -19,7 +19,7 @@ class playerObj {
   constructor(name, isTurn, energy, shipObjArray){
     this.isTurn = isTurn ?? false //boolean
     this.energy = energy ?? -1 //int
-    this.shipObjArray = shipObjArray ?? new shipObj() //ship object
+    this.shipObjArray = shipObjArray ?? new Array(5).fill(new shipObj()) //ship object
   }
 
   convertToSQL() {
