@@ -132,7 +132,7 @@ async function main(){
     res.send('ok')
   })
 
-  express.get("/testLog3", async (req, res) => {
+  express.get("/testLog4", async (req, res) => {
     await databaseController.deleteEarlyLogs(3)
     res.send('ok')
   })
