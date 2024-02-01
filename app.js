@@ -135,6 +135,11 @@ async function main(){
   io.on("connection", async (socket) => {
     databaseController.writeLog('general', 'noRoom', socket.id, 'unknownUser', 'new socket connected');
 
+    socket.on('ping', async () => {
+      socket.emit('pong', 'ok')
+      return
+    })
+
     socket.on("disconnect", async (err) => {
       var a = await roomController.getRoomOfUserFromID(socket.id)
       if(!a.roomID) {
