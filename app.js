@@ -9,7 +9,7 @@ const databaseController = require("./data/dbControl.js");
 
 // Important! Set the port using the PORT environment variable
 const port = process.env.PORT ?? 3000;
-const port2 = process.env.PORT2 ?? 5000;
+//const port2 = process.env.PORT2 ?? 5000;
 
 const { Server } = require("socket.io");
 
@@ -22,11 +22,11 @@ const io = new Server(httpServer, {
   },
 });
 
-httpServer.listen(port, () => {
-  console.log(`Socket listening on port ${port}`);
-});
+// httpServer.listen(port, () => {
+//   console.log(`Socket listening on port ${port}`);
+// });
 
-express.listen(port2, () => {
+express.listen(port, () => {
   console.log(`Express listening on port ${port}`);
 })
 
