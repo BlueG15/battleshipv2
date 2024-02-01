@@ -7,21 +7,25 @@ express.use(cors())
 const roomController = require("./data/roomControl.js");
 const databaseController = require("./data/dbControl.js");
 
+// Important! Set the port using the PORT environment variable
+const port = process.env.PORT ?? 3000;
+
+const { Server } = require("socket.io");
+
+const httpServer = createServer(express); //direct express into the http server
+const io = new Server(httpServer, {
+  path: "/",
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
+
+httpServer.listen(port, () => {
+  console.log(`Express listening on port ${port}`);
+});
+
 async function main(){
-  // Important! Set the port using the PORT environment variable
-  const port = process.env.PORT ?? 3000;
-
-  const { Server } = require("socket.io");
-
-  const httpServer = createServer(express); //direct express into the http server
-  const io = new Server(httpServer, {
-    path: "/",
-    cors: {
-      origin: "*",
-      methods: ["GET", "POST"],
-    },
-  });
-  
   express.get("/", (req, res) => {
     res.send("Hello World!");
   });
@@ -153,10 +157,6 @@ async function main(){
 
   await roomController.bootstrap();
   await databaseController.initializeLogTable();
-  
-  httpServer.listen(port, () => {
-    console.log(`Express listening on port ${port}`);
-  });
 }
 
 main()
