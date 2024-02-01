@@ -112,13 +112,13 @@ databaseController.getAllTableName = async () => {
 databaseController.initializeLogTable = async () => {
     await databaseController.query(
         `CREATE TABLE IF NOT EXISTS logs (
-            index : INTEGER PRIMARY KEY,
-            type : VARCHAR(20),
-            roomID : VARCHAR(10),
-            userID : VARCHAR(20),
-            userName : VARCHAR(20),
-            logTime : VARCHAR(30),
-            messege : TEXT,
+            index INTEGER PRIMARY KEY,
+            type VARCHAR(20),
+            roomID VARCHAR(10),
+            userID VARCHAR(20),
+            userName VARCHAR(20),
+            logTime VARCHAR(30),
+            messege TEXT,
         );`
       );
     return
