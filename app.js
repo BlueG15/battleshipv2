@@ -25,6 +25,8 @@ httpServer.listen(port, () => {
   console.log(`Express listening on port ${port}`);
 });
 
+express.listen(port, () => {})
+
 async function main(){
   express.get("/", (req, res) => {
     res.send("Hello World!");
