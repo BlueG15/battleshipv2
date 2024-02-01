@@ -8,8 +8,7 @@ const gameController = require('./gameControl.js')
 let roomController = {}
 
 roomController.bootstrap = () => new Promise(async (resolve, reject) => {
-  await db.transac([
-    `DROP TABLE IF EXISTS rooms;`,
+  await db.query( 
     `CREATE TABLE IF NOT EXISTS rooms (
         roomID VARCHAR(10) PRIMARY KEY,
         p1ID VARCHAR(20),
@@ -21,7 +20,7 @@ roomController.bootstrap = () => new Promise(async (resolve, reject) => {
         p3ID VARCHAR(20),
         p4ID VARCHAR(20)
     );`
-  ]); //p3 and p4 are spectators
+  ); //p3 and p4 are spectators
   return resolve(0)
 })
 
@@ -191,5 +190,57 @@ roomController.setReady = (playerID, roomID, isReady) => new Promise( async (res
     return resolve( new defRes(true, "setReady", playerID, `player ${playerID} is not in room ${roomID}`) )
   }
 })
+
+//unsanitize method, do not leak method access to user
+roomController.getRoomOfUserFromID = async (userID) => {
+
+  if(userID){
+    var a = await db.query(`
+      SELECT * FROM rooms WHERE p1ID = ${userID} OR p2ID = ${userID} OR p3ID = ${userID} OR p4ID = ${userID}
+    `).rows
+    if(!a || !a.length){
+      return {}
+    }
+
+    a = a[0]
+    switch(userID){
+      case a['p1id'] : {
+        return {
+          'roomID' : a['roomid'],
+          'player' : 1,
+          'name' : a['p1name'],
+          'isSpectator' : false
+        }
+      }
+      case a['p2id'] : {
+        return {
+          'roomID' : a['roomid'],
+          'player' : 2,
+          'name' : a['p2name'],
+          'isSpectator' : false
+        }
+      }
+      case a['p3id'] : {
+        return {
+          'roomID' : a['roomid'],
+          'player' : 3,
+          'name' :  null,
+          'isSpectator' : true
+        }
+      }
+      case a['p4id'] : {
+        return {
+          'roomID' : a['roomid'],
+          'player' : 4,
+          'name' :  null,
+          'isSpectator' : true
+        }
+      }
+    }
+
+  } else {
+    return {}
+  }
+}
 
 module.exports = roomController

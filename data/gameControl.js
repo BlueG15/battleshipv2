@@ -100,4 +100,9 @@ gameController.updatePlayer = async (playerID, isTurn, energy, shipObjArray) => 
   await db.query(`UPDATE ${roomID} SET p${player}Obj = ${new playerObj(isTurn, energy, shipObjArray).convertToSQL()} WHERE roomID = ${roomID}`)
 }
 
+gameController.getGameData = async (roomID) => {
+  var a = await db.query(`SELECT * FROM ${roomID} WHERE roomID = ${roomID}`)
+  return a[0]
+}
+
 module.exports = gameController

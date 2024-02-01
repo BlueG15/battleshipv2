@@ -1,4 +1,6 @@
 const pg = require('pg');
+const response = require('./responses.js');
+const { data } = require('cheerio/lib/api/attributes.js');
 
 const pool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
@@ -97,6 +99,62 @@ databaseController.sanitizeString = (str) => {
     const reg = new RegExp(/(\W)+|SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|AND|OR|CREATE|ALTER|DROP|TABLE|DATABASE|BEGIN|COMMIT|ROLLBACK/gim)
     str = str.replace(reg, "")
     return (!str || !str.length) ? "unknownPlayer" : str
+}
+
+databaseController.getAllTableName = async () => {
+    var a = await databaseController.query(`
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_type = 'BASE TABLE;
+    `)
+    return a
+}
+
+databaseController.initializeLogTable = async () => {
+    await db.query(
+        `CREATE TABLE IF NOT EXISTS logs (
+            index : INTEGER PRIMARY KEY,
+            type : VARCHAR(20),
+            roomID : VARCHAR(10),
+            userID : VARCHAR(20),
+            userName : VARCHAR(20),
+            logTime : VARCHAR(30),
+            messege : TEXT,
+        );`
+      );
+    return
+}
+
+databaseController.writeLog = async (type = `NULL`, roomID = `NULL`, userID = `NULL`, userName = `NULL`, messege = `NULL`) => {
+    var logTime = new Date().toISOString()
+    var a = await db.query(`SELECT index FROM logs`)[0]
+    await db.query(`
+        INSERT INTO logs (index, type, roomID, userID, userName, logTime, messege) VALUES (${a[a.length - 1]}, ${type}, ${roomID}, ${userID}, ${userName}, ${logTime}, ${messege});
+    `)
+    return new response(false, 'writeLog', userID, 'successfully write log')
+}
+
+databaseController.getAllLogs = async () => {
+    var a = await db.query(`SELECT * FROM logs`)
+    return a
+}
+
+databaseController.test = async () => {
+    var a = await db.query(`SELECT index FROM logs`)
+    return a
+}
+
+databaseController.deleteEarlyLogs = async(n) => {
+    if(isNaN(n) || n == Infinity || n <= 0){
+        return 
+    }
+    await this.transac([
+        `DELETE FROM logs
+        WHERE index BETWEEN 1 AND ${n};`,
+        `UPDATE logs
+        SET index = index - 100
+        WHERE index > ${n};`
+    ])
 }
 
 module.exports = databaseController
