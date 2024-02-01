@@ -129,11 +129,6 @@ async function main(){
     await databaseController.deleteEarlyLogs(3)
     res.send('ok')
   })
-  
-  express.get("/testLog4", async (req, res) => {
-    await databaseController.deleteEarlyLogs(3)
-    res.send('ok')
-  })
   }
   
   //socket section
@@ -153,7 +148,7 @@ async function main(){
 
   });
   
-  await roomController.dropRoomTable();
+  await databaseController.cleanAllTablesButLogs();
   await roomController.bootstrap();
   await databaseController.initializeLogTable();
 }

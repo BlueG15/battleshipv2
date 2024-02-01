@@ -155,9 +155,21 @@ databaseController.deleteEarlyLogs = async(n) => {
         `DELETE FROM logs
         WHERE index BETWEEN 1 AND ${n};`,
         `UPDATE logs
-        SET index = index - 100
+        SET index = index - ${n}
         WHERE index > ${n};`
     ])
+}
+
+databaseController.cleanAllTablesButLogs = async () => {
+    var all = await databaseController.getAllTableName()
+    var q = []
+    all.forEach(i => {
+        if(i['table_name'] != 'logs'){
+            q.push(`DROP TABLE ${i['table_name']};`)
+        }
+    })
+    await databaseController.transac(q)
+    return
 }
 
 module.exports = databaseController
