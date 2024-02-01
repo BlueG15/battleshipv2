@@ -110,7 +110,7 @@ databaseController.getAllTableName = async () => {
 }
 
 databaseController.initializeLogTable = async () => {
-    await this.query(
+    await databaseController.query(
         `CREATE TABLE IF NOT EXISTS logs (
             index : INTEGER PRIMARY KEY,
             type : VARCHAR(20),
@@ -126,20 +126,20 @@ databaseController.initializeLogTable = async () => {
 
 databaseController.writeLog = async (type = `NULL`, roomID = `NULL`, userID = `NULL`, userName = `NULL`, messege = `NULL`) => {
     var logTime = new Date().toISOString()
-    var a = await db.query(`SELECT index FROM logs`)[0]
-    await db.query(`
+    var a = await databaseController.query(`SELECT index FROM logs`)[0]
+    await databaseController.query(`
         INSERT INTO logs (index, type, roomID, userID, userName, logTime, messege) VALUES (${a[a.length - 1]}, ${type}, ${roomID}, ${userID}, ${userName}, ${logTime}, ${messege});
     `)
     return new response(false, 'writeLog', userID, 'successfully write log')
 }
 
 databaseController.getAllLogs = async () => {
-    var a = await db.query(`SELECT * FROM logs`)
+    var a = await databaseController.query(`SELECT * FROM logs`)
     return a
 }
 
 databaseController.test = async () => {
-    var a = await db.query(`SELECT index FROM logs`)
+    var a = await databaseController.query(`SELECT index FROM logs`)
     return a
 }
 
@@ -147,7 +147,7 @@ databaseController.deleteEarlyLogs = async(n) => {
     if(isNaN(n) || n == Infinity || n <= 0){
         return 
     }
-    await this.transac([
+    await databaseController.transac([
         `DELETE FROM logs
         WHERE index BETWEEN 1 AND ${n};`,
         `UPDATE logs
