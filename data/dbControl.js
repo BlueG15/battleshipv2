@@ -111,7 +111,7 @@ databaseController.getAllTableName = async () => {
 
 databaseController.initializeLogTable = async () => {
     await databaseController.transac([
-        `DROP TABLE IF EXISTS logs`,
+        `DROP TABLE IF EXISTS logs`, //delete in final production, move to a sepaarte property in controller
         `CREATE TABLE IF NOT EXISTS logs (
             index INTEGER PRIMARY KEY,
             type VARCHAR(20),
@@ -132,7 +132,7 @@ databaseController.writeLog = async (type = `NULL`, roomID = `NULL`, userID = `N
     var logTime = new Date().toISOString()
     var a = await databaseController.query(`SELECT index FROM logs`)
     await databaseController.query(`
-        INSERT INTO logs (index, type, roomID, userID, userName, logTime, message) VALUES (${a.length}, ${type}, ${roomID}, ${userID}, ${userName}, ${logTime}, ${messege});
+        INSERT INTO logs (index, type, roomID, userID, userName, logTime, message) VALUES (${a.length}, '${type}', '${roomID}', '${userID}', '${userName}', '${logTime}', '${messege}');
     `)
     return new response(false, 'writeLog', userID, 'successfully write log')
 }
