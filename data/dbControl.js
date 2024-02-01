@@ -118,7 +118,7 @@ databaseController.initializeLogTable = async () => {
             userID VARCHAR(20),
             userName VARCHAR(20),
             logTime VARCHAR(30),
-            message TEXT,
+            message TEXT
         );`
       );
     return
