@@ -110,7 +110,7 @@ databaseController.getAllTableName = async () => {
 }
 
 databaseController.initializeLogTable = async () => {
-    await db.query(
+    await this.query(
         `CREATE TABLE IF NOT EXISTS logs (
             index : INTEGER PRIMARY KEY,
             type : VARCHAR(20),
