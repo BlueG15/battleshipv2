@@ -126,9 +126,9 @@ databaseController.initializeLogTable = async () => {
 
 databaseController.writeLog = async (type = `NULL`, roomID = `NULL`, userID = `NULL`, userName = `NULL`, messege = `NULL`) => {
     var logTime = new Date().toISOString()
-    var a = await databaseController.query(`SELECT index FROM logs`)[0]
+    var a = await databaseController.query(`SELECT index FROM logs`)
     await databaseController.query(`
-        INSERT INTO logs (index, type, roomID, userID, userName, logTime, message) VALUES (0, ${type}, ${roomID}, ${userID}, ${userName}, ${logTime}, ${messege});
+        INSERT INTO logs (index, type, roomID, userID, userName, logTime, message) VALUES (${a.length}, ${type}, ${roomID}, ${userID}, ${userName}, ${logTime}, ${messege});
     `)
     return new response(false, 'writeLog', userID, 'successfully write log')
 }
