@@ -1,6 +1,5 @@
 const pg = require('pg');
 const response = require('./responses.js');
-const { data } = require('cheerio/lib/api/attributes.js');
 
 const pool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
