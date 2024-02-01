@@ -7,6 +7,13 @@ const gameController = require('./gameControl.js')
 
 let roomController = {}
 
+roomController.dropRoomTable = async () => {
+  await db.query(`
+    DROP TABLE IF EXISTS rooms;
+  `)
+  return
+}
+
 roomController.bootstrap = () => new Promise(async (resolve, reject) => {
   await db.query( 
     `CREATE TABLE IF NOT EXISTS rooms (

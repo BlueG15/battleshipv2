@@ -153,7 +153,7 @@ async function main(){
 
   });
   
-
+  await roomController.dropRoomTable();
   await roomController.bootstrap();
   await databaseController.initializeLogTable();
 }
