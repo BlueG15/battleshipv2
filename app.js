@@ -14,7 +14,6 @@ const { Server } = require("socket.io");
 
 const httpServer = createServer(express); //direct express into the http server
 const io = new Server(httpServer, {
-  path: "/",
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
