@@ -111,6 +111,7 @@ databaseController.getAllTableName = async () => {
 
 databaseController.initializeLogTable = async () => {
     await databaseController.transac([
+        `DROP TABLE IF EXISTS logs`,
         `CREATE TABLE IF NOT EXISTS logs (
             index INTEGER PRIMARY KEY,
             type VARCHAR(20),
@@ -120,7 +121,9 @@ databaseController.initializeLogTable = async () => {
             logTime VARCHAR(30),
             message TEXT
         );`,
-        `INSERT INTO logs (index, type, roomID, userID, userName, logTime, message) VALUES (0, 'default', 'NULL', 'NULL', 'NULL', 'NULL', 'default initial log');`
+        `INSERT INTO logs (index, type, roomID, userID, userName, logTime, message) VALUES (0, 'default', 'NULL', 'NULL', 'NULL', 'NULL', 'default initial log');`,
+        `INSERT INTO logs (index, type, roomID, userID, userName, logTime, message) VALUES (1, 'default', 'NULL', 'NULL', 'NULL', 'NULL', 'default initial log 2');`,
+        `INSERT INTO logs (index, type, roomID, userID, userName, logTime, message) VALUES (2, 'default', 'NULL', 'NULL', 'NULL', 'NULL', 'default initial log 3');`,
     ]);
     return
 }
