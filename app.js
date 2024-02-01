@@ -27,10 +27,6 @@ async function main(){
     res.send("Hello World!");
   });
 
-  express.listen(4000, "localhost", async () => {
-    console.log('server started')
-  })
-
   const defTestPlayerID1 = new Array(20).fill("A").join("")
   const defTestPlayerID2 = new Array(20).fill("B").join("")
   const defTestPlayerID3 = new Array(20).fill("C").join("")
