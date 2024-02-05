@@ -185,6 +185,7 @@ async function main(){
             'input' : args
           }
 
+                   
           var re = await load(inputObj);
           
           if(!re['roomData']){ //get roomData if response doesnt have it
@@ -193,6 +194,11 @@ async function main(){
             re['roomID'] = x['roomID']
             var y = await roomController.getRoomData(re['roomID'])
             re['roomID'] = y
+          }
+
+          if(!re['roomData']['roomID']){
+            //player not of any room
+            //currently dont have anything since it shouls still works
           }
           
           for (var i = 1; i <= 4; i++) {
@@ -250,12 +256,12 @@ async function main(){
           return
   
         } catch (err) {
-          io.to(socket.id).emit(event, new response(true, event, socket.id, `failure to execute event`))
+          io.to(socket.id).emit(event, new response(true, event, socket.id, `failure to execute event`, {error: String(err)}))
           return
         }
   
       } catch (err) { //try catch of the entire onAny code block
-        io.to(socket.id).emit(event, new response(true, event, socket.id, `total server failure`))
+        io.to(socket.id).emit(event, new response(true, event, socket.id, `total server failure`, {error: String(err)}))
         return
       }
     })
