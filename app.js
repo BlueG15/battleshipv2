@@ -203,7 +203,7 @@ async function main(){
           
           for (var i = 1; i <= 4; i++) {
 
-            if(re['ignore'].includes(i)) continue
+            if(re['ignore'] && re['ignore'].includes(i)) continue
 
             //handling overide properties
             if(re['sendToAll']) {
@@ -256,12 +256,12 @@ async function main(){
           return
   
         } catch (err) {
-          io.to(socket.id).emit(event, new response(true, event, socket.id, `failure to execute event`, {error: String(err)}))
+          io.to(socket.id).emit(event, new response(true, event, socket.id, `failure to execute event`, {'error': String(err)}))
           return
         }
   
       } catch (err) { //try catch of the entire onAny code block
-        io.to(socket.id).emit(event, new response(true, event, socket.id, `total server failure`, {error: String(err)}))
+        io.to(socket.id).emit(event, new response(true, event, socket.id, `total server failure`, {'error': String(err)}))
         return
       }
     })
