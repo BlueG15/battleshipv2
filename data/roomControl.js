@@ -202,7 +202,7 @@ roomController.getRoomOfUserFromID = async (userID) => {
 
   if(userID){
     var a = await db.query(`
-      SELECT * FROM rooms WHERE p1ID = ${userID} OR p2ID = ${userID} OR p3ID = ${userID} OR p4ID = ${userID}
+      SELECT * FROM rooms WHERE p1ID = '${userID}' OR p2ID = '${userID}' OR p3ID = '${userID}' OR p4ID = '${userID}'
     `).rows
     if(!a || !a.length){
       return {}
