@@ -67,12 +67,11 @@ roomController.getRoomData = (roomID) => new Promise( async (resolve, reject) =>
 
 roomController.createRoom = (playerID, playerName) => new Promise( async (resolve, reject) => {
   const exist = await db.query(`SELECT roomID FROM rooms`)
-  let len = 5
+  let len = 6
   let roomID = generateRandomID(5)
   let count = 0
   while (exist.includes(roomID) && count < 300){
     roomID = generateRandomID(len)
-    len += Math.floor(count / 50)
     count++
   }
   if(exist.includes(roomID)){
@@ -216,7 +215,7 @@ roomController.getRoomOfUserFromID = async (userID) => {
           'roomID' : a['roomid'],
           'player' : 1,
           'name' : a['p1name'],
-          'isSpectator' : false
+          'isSpectator' : false,
         }
       }
       case a['p2id'] : {
