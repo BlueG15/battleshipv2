@@ -17,7 +17,7 @@ class response  {
                 this.note = note
                 this.event= event
                 this.timeStamp = time
-                this.data = {} 
+                this.data = data 
                 break
             }  
         }
