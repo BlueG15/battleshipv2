@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.e = exports.eventController = void 0;
+exports.e = exports.eControl = void 0;
 const universalModuleInput_1 = require("../utils/classes/universalModuleInput");
 class e {
-    constructor(moduleName, activationTime, data) {
+    constructor(cause, moduleName, activationTime, data) {
+        this.cause = cause;
         this.moduleName = moduleName;
         this.activationTime = activationTime;
         this.data = data !== null && data !== void 0 ? data : new universalModuleInput_1.moduleInput();
@@ -31,7 +32,7 @@ class eventController {
         //the reason we cant execute these events right here is cause it involves socket stuff, 
         //and all socket stuff resides in the main js file....cause i said so
         let res = [];
-        while (this.events[0].activationTime && this.events[0].activationTime <= this.currentTime) {
+        while (this.events[0] && this.events[0].activationTime && this.events[0].activationTime <= this.currentTime) {
             var a = this.events.shift();
             if (!a)
                 break;
@@ -39,10 +40,27 @@ class eventController {
         }
         return res;
     }
+    emergencyBreak() {
+        this.events = [];
+        this.currentTime = 0;
+    }
+    incrementTime() {
+        if (!this.events.length) {
+            this.emergencyBreak();
+            return [];
+        }
+        let res = this.selectEventForExecution();
+        this.currentTime += this.timePerFrame;
+        return res;
+    }
+    removeAllEventsAddedByAPlayer(id) {
+        this.events = this.events.filter((a, index) => { return a.cause != id; });
+    }
     clearInterval() {
         if (!this.intervalID)
             return;
         clearInterval(this.intervalID);
     }
 }
-exports.eventController = eventController;
+let eControl = new eventController();
+exports.eControl = eControl;
