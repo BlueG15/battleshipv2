@@ -24,6 +24,45 @@ class utils {
         }
         return charArr.join('');
     }
+    convertToPGValue(x) {
+        if (!x && x != 0)
+            return "NULL";
+        let type = "";
+        if (typeof x != "object") {
+            if (typeof x == "string") {
+                return `'${x.toString()}'`;
+            }
+            else
+                return x.toString();
+        }
+        else {
+            switch (typeof x[0]) {
+                case "number":
+                    {
+                        type = "SMALLINT";
+                        break;
+                    }
+                    ;
+                case "string":
+                    {
+                        type = "TEXT";
+                        break;
+                    }
+                    ;
+                case "boolean":
+                    {
+                        type = "BOOLEAN";
+                        break;
+                    }
+                    ;
+                default: {
+                    return "NULL";
+                }
+            }
+            x = x.map(i => this.convertToPGValue(i));
+            return `ARRAY[${x.join(", ")}]::${type}[]`;
+        }
+    }
 }
 let a = new utils();
 exports.default = a;

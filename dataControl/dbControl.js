@@ -225,5 +225,52 @@ class databaseController {
             connectionString: process.env.POSTGRES_URL,
         });
     }
+    //all methods below are unsanitized, use at careful consideration
+    async insertRow(tableName, fields, values) {
+        let str = `
+            INSERT INTO ${tableName} (${fields.join(", ")}) 
+            VALUES (${values.join(", ")});`;
+        await this.query(str);
+    }
+    async updateTable(tableName, fields, values, primaryKeyName, primaryKeyValue) {
+        let tempStr = [];
+        fields.forEach((i, index) => {
+            tempStr.push(`${i} = ${values[index]}`);
+        });
+        let str = `
+            UPDATE ${tableName} 
+            SET ${tempStr.join(", ")}
+            WHERE ${primaryKeyName} = ${primaryKeyValue};`;
+        await this.query(str);
+    }
+    async deleteRow(tableName, primaryKeyName, primaryKeyValue) {
+        let str = `
+            DELETE FROM ${tableName}
+            WHERE ${primaryKeyName} = ${primaryKeyValue}
+            RETURNING *;`;
+        return this.query(str);
+    }
+    async setValuesNULL(tableName, fields, primaryKeyName, primaryKeyValue) {
+        let tempStr = [];
+        fields.forEach((i) => {
+            tempStr.push(`${i} = NULL`);
+        });
+        let str = `
+            UPDATE ${tableName} 
+            SET ${tempStr.join(", ")}
+            WHERE ${primaryKeyName} = ${primaryKeyValue};`;
+        await this.query(str);
+    }
+    async addField(tableName, fields, types) {
+        let tempStr = [];
+        fields.forEach((i, index) => {
+            tempStr.push(`ADD COLUMN ${i} ${types[index]}`);
+        });
+        let str = `
+            ALTER TABLE ${tableName}
+            ${tempStr.join(", ")};
+        `;
+        await this.query(str);
+    }
 }
 exports.databaseController = databaseController;

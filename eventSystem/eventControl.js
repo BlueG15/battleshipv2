@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.e = exports.eControl = void 0;
+exports.e = exports.eventController = void 0;
 const universalModuleInput_1 = require("../utils/classes/universalModuleInput");
 class e {
     constructor(cause, moduleName, activationTime, data) {
@@ -62,5 +62,4 @@ class eventController {
         clearInterval(this.intervalID);
     }
 }
-let eControl = new eventController();
-exports.eControl = eControl;
+exports.eventController = eventController;

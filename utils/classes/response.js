@@ -26,5 +26,10 @@ class response {
             }
         }
     }
+    fixAndAppendData(event, note, player) {
+        this.event += " called from " + event;
+        this.player = player ? player : "unknown";
+        this.note += " " + note;
+    }
 }
 exports.response = response;

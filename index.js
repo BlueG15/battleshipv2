@@ -28,19 +28,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const universalModuleInput_1 = require("./utils/classes/universalModuleInput");
+const universalModuleRes_1 = require("./utils/classes/universalModuleRes");
 const response_1 = require("./utils/classes/response");
 //pg system
 //import { default as db } from "./dataControl/dbControl"
 const dbControl_1 = require("./dataControl/dbControl");
-const roomControl_1 = require("./dataControl/roomControl");
-const gameControl_1 = require("./dataControl/gameControl");
+const newRoomControl_1 = require("./dataControl/newRoomControl");
 //event system
 const eventControl_1 = require("./eventSystem/eventControl");
 //initialization code, server startup and whatnot
 //note to self: change allowEvents array to also be dynamic through fs readDirSync
-const allowEvents = ["ping", "pingStop"];
+const allowEvents = ["ping", "pingStop", "createRoom", "joinRoom", "uploadShipData"];
 const spectatorEvents = [];
-const testEvents = ["ping", "pingStop"];
+const testEvents = ["ping", "pingStop", "createRoom", "joinRoom"];
 const http_1 = require("http");
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
@@ -78,27 +78,28 @@ async function main() {
     //setup
     setUpExpressEndpoints();
     let db = new dbControl_1.databaseController();
-    let game = new gameControl_1.gameController(db);
-    let room = new roomControl_1.roomController(db);
-    //commented out due to not needed
-    //await game.defineType
-    //await db.initializeLogTable()
-    //await room.init();
+    let roomdb = new newRoomControl_1.roomController(db);
+    let eventdb = new eventControl_1.eventController();
     async function loadModule(e, input) {
         //ok, brace self for try catch tower
+        let preload = undefined;
         let load = undefined;
         try {
-            load = await Promise.resolve(`${`./module/${e}.js`}`).then(s => __importStar(require(s)));
-            load = load.default;
+            preload = await Promise.resolve(`${`./module/${e}.js`}`).then(s => __importStar(require(s)));
+            load = preload.default;
         }
         catch (err) {
+            if (err instanceof response_1.response) {
+                err.fixAndAppendData(e, ` cannot load module ${e}`);
+                return err;
+            }
             return new response_1.response(true, e, "unknownPlayer", "cannot load module", {
                 fullError: err.toString()
             });
         }
         let res = undefined;
         try {
-            res = await load(input);
+            res = await load(input, roomdb, eventdb);
         }
         catch (err) {
             return new response_1.response(true, e, "unknownPlayer", "cannot run module", {
@@ -190,7 +191,7 @@ async function main() {
         }
     }
     async function intervalLoop() {
-        let eArr = eventControl_1.eControl.incrementTime();
+        let eArr = eventdb.incrementTime();
         if (eArr && eArr.length) {
             for (let j = 0; j < eArr.length; j++) {
                 let i = eArr[j];
@@ -208,23 +209,30 @@ async function main() {
         }
     }
     //initialize event loop
-    eventControl_1.eControl.intervalID = setInterval(intervalLoop, eventControl_1.eControl.timePerFrame);
+    eventdb.intervalID = setInterval(intervalLoop, eventdb.timePerFrame);
     //socket section
     io.on("connection", async (socket) => {
         db.writeLog('general', 'noRoom', socket.id, 'unknownUser', 'new socket connected');
         socket.on("disconnect", async (reason) => {
-            eventControl_1.eControl.removeAllEventsAddedByAPlayer(socket.id);
+            eventdb.removeAllEventsAddedByAPlayer(socket.id);
+            let playerData = await roomdb.getRoomOfUserFromID(socket.id);
+            if (!playerData || !playerData.roomID)
+                return;
+            let x = await roomdb.removeFromRoom(playerData.roomID, socket.id);
+            let emptyParam = new universalModuleInput_1.moduleInput(playerData, "disconnect", undefined);
+            let res = new universalModuleRes_1.moduleRes(`socket ${socket.id} disconnected`, undefined, undefined, x);
+            await handleModuleRes(emptyParam, res);
         });
         // https://socket.io/docs/v4/server-api/#socketonanycallback
         socket.onAny(async (event, ...args) => {
             if (!testAllowEvent(event))
                 return;
-            let playerData = await room.getRoomOfUserFromID(socket.id);
+            let playerData = await roomdb.getRoomOfUserFromID(socket.id);
             if (!playerData)
                 return;
             if (!playerData.roomID) {
                 let emptyParam = new universalModuleInput_1.moduleInput(playerData, event, undefined);
-                //player is not in any roomat are exclusively for testing
+                //player is not in any room, trigger exclusively testing events
                 if (!testTestEvent(event))
                     return;
                 //is test event, execute
@@ -237,10 +245,11 @@ async function main() {
                 else {
                     await handleModuleRes(emptyParam, res);
                 }
-                //only handle unit events th
                 return;
             }
             ;
+            if (testTestEvent(event))
+                return; //past this point cannot trigger test events
             let k = undefined;
             if (args && args[0])
                 k = args[0];
