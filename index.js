@@ -79,6 +79,7 @@ async function main() {
     //setup
     setUpExpressEndpoints();
     let db = new dbControl_1.databaseController();
+    db.connect();
     let roomdb = new newRoomControl_1.roomController(db);
     let eventdb = new eventControl_1.eventController();
     async function loadModule(e, input) {
