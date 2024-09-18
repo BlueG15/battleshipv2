@@ -232,11 +232,26 @@ async function main() {
             let playerData = await roomdb.getRoomOfUserFromID(socket.id);
             if (!playerData)
                 return;
-            if (!playerData.roomID) {
-                let emptyParam = new universalModuleInput_1.moduleInput(playerData, event, undefined);
+            let emptyParam = new universalModuleInput_1.moduleInput(playerData, event, undefined);
+            async function parseArgs(...args) {
                 let k = undefined;
-                if (args && args[0])
+                if (args && args[0]) {
                     k = args[0];
+                    try {
+                        k = JSON.parse(k);
+                    }
+                    catch (err) {
+                        let res = new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, new response_1.response(true, event, (playerData && playerData.name) ? playerData.name : "unknown", `failed to parse input`, { input: args }));
+                        await handleModuleRes(emptyParam, res);
+                        return;
+                    }
+                }
+                else
+                    k = {};
+                return k;
+            }
+            if (!playerData.roomID) {
+                let k = await parseArgs(args);
                 let param = emptyParam;
                 if (k)
                     param = new universalModuleInput_1.moduleInput(playerData, event, k);
@@ -258,11 +273,7 @@ async function main() {
             ;
             if (testTestEvent(event))
                 return; //past this point cannot trigger test events
-            let k = undefined;
-            if (args && args[0])
-                k = args[0];
-            else
-                k = {};
+            let k = await parseArgs(args);
             let param = new universalModuleInput_1.moduleInput(playerData, event, k);
             let res = await loadModule(event, param);
             if (!res)
