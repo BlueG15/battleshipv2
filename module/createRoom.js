@@ -11,14 +11,14 @@ async function createRoom(input, roomdb, eventdb) {
     let k = (0, genericModInputVerifier_1.default)(input, true, false);
     if (k.fail) {
         k.fixAndAppendData("createRoom", `failed to validate input`, "unknown");
-        return new universalModuleRes_1.moduleRes(k);
+        return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, k);
     }
     let arr = ["name", "mode"];
     let arr2 = ["string", "number"];
     arr.forEach((i, index) => {
         if (!input.data || !input.data[i] || (typeof input.data[i]) != arr2[index]) {
             let res = new response_1.response(true, "uploadShipData", "unknown", `no ${i} in input data or wrong type`, { input: input });
-            return new universalModuleRes_1.moduleRes(res);
+            return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, k);
         }
     });
     if (!input.cause || !input.cause.playerID || !input.data || !input.data.name || !input.data.mode)
@@ -27,10 +27,10 @@ async function createRoom(input, roomdb, eventdb) {
     let final = await roomdb.createRoomAndInsertPlayer1(player, input.data.mode);
     if (final.fail) {
         final.fixAndAppendData("createRoom", ``, input.data.name);
-        return new universalModuleRes_1.moduleRes(final);
+        return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, final);
     }
     if (!final.data.roomID)
         throw new Error("CRITICAL SERVER FAILURE IN CREATEROOM");
-    return new universalModuleRes_1.moduleRes(final);
+    return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, final);
 }
 exports.default = createRoom;
