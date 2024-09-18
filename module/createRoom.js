@@ -17,7 +17,7 @@ async function createRoom(input, roomdb, eventdb) {
     let arr2 = ["string", "number"];
     for (let index = 0; index < arr.length; index++) {
         let i = arr[index];
-        if (!input.data || !input.data[i] || (typeof input.data[i]) != arr2[index]) {
+        if (!input.data || (!input.data[i] && input.data[i] != 0) || (typeof input.data[i]) != arr2[index]) {
             let res = new response_1.response(true, "createRoom", "unknown", `no ${i} in input data or wrong type`, { input: input });
             return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, res);
         }
