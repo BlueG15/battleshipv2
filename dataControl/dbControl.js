@@ -244,13 +244,13 @@ class databaseController {
         let str = `
             UPDATE ${tableName} 
             SET ${tempStr.join(", ")}
-            WHERE ${primaryKeyName} = ${primaryKeyValue};`;
+            WHERE ${primaryKeyName} = '${primaryKeyValue}';`;
         await this.query(str);
     }
     async deleteRow(tableName, primaryKeyName, primaryKeyValue) {
         let str = `
             DELETE FROM ${tableName}
-            WHERE ${primaryKeyName} = ${primaryKeyValue}
+            WHERE ${primaryKeyName} = '${primaryKeyValue}'
             RETURNING *;`;
         return this.query(str);
     }
@@ -262,7 +262,7 @@ class databaseController {
         let str = `
             UPDATE ${tableName} 
             SET ${tempStr.join(", ")}
-            WHERE ${primaryKeyName} = ${primaryKeyValue};`;
+            WHERE ${primaryKeyName} = '${primaryKeyValue}';`; //this forces primary key to be string lol
         await this.query(str);
     }
     async addField(tableName, fields, types) {
