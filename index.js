@@ -238,12 +238,12 @@ async function main() {
                 if (args && args[0]) {
                     k = args[0];
                     try {
+                        console.log(`input : `, args);
                         k = JSON.parse(k);
                     }
                     catch (err) {
                         let res = new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, new response_1.response(true, event, (playerData && playerData.name) ? playerData.name : "unknown", `failed to parse input`, { input: args }));
-                        await handleModuleRes(emptyParam, res);
-                        return;
+                        return res;
                     }
                 }
                 else
@@ -252,6 +252,10 @@ async function main() {
             }
             if (!playerData.roomID) {
                 let k = await parseArgs(args);
+                if (k instanceof universalModuleRes_1.moduleRes) {
+                    await handleModuleRes(emptyParam, k);
+                    return;
+                }
                 let param = emptyParam;
                 if (k)
                     param = new universalModuleInput_1.moduleInput(playerData, event, k);
@@ -274,6 +278,10 @@ async function main() {
             if (testTestEvent(event))
                 return; //past this point cannot trigger test events
             let k = await parseArgs(args);
+            if (k instanceof universalModuleRes_1.moduleRes) {
+                await handleModuleRes(emptyParam, k);
+                return;
+            }
             let param = new universalModuleInput_1.moduleInput(playerData, event, k);
             let res = await loadModule(event, param);
             if (!res)
