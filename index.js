@@ -235,10 +235,10 @@ async function main() {
             let emptyParam = new universalModuleInput_1.moduleInput(playerData, event, undefined);
             async function parseArgs(...args) {
                 let k = undefined;
-                if (args && args[0]) {
-                    k = args[0];
+                if (args && args[0] && args[0][0]) {
+                    k = args[0][0];
                     try {
-                        console.log(`input : `, args);
+                        //console.log(`input : `, args)
                         k = JSON.parse(k);
                     }
                     catch (err) {
