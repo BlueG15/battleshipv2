@@ -234,18 +234,24 @@ async function main() {
                 return;
             if (!playerData.roomID) {
                 let emptyParam = new universalModuleInput_1.moduleInput(playerData, event, undefined);
+                let k = undefined;
+                if (args && args[0])
+                    k = args[0];
+                let param = emptyParam;
+                if (k)
+                    param = new universalModuleInput_1.moduleInput(playerData, event, k);
                 //player is not in any room, trigger exclusively testing events
                 if (!testTestEvent(event))
                     return;
                 //is test event, execute
-                let res = await loadModule(event, emptyParam);
+                let res = await loadModule(event, param);
                 if (!res)
                     return;
                 if (res instanceof response_1.response) {
                     io.to(socket.id).emit(event, res);
                 }
                 else {
-                    await handleModuleRes(emptyParam, res);
+                    await handleModuleRes(param, res);
                 }
                 return;
             }
