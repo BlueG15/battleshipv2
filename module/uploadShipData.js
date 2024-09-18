@@ -17,12 +17,13 @@ async function uploadShipData(input, roomdb, eventdb) {
     }
     let arr = ["roomID", "playerID", "shipData"];
     let arr2 = ["string", "string", "object"];
-    arr.forEach((i, index) => {
+    for (let index = 0; index < arr.length; index++) {
+        let i = arr[index];
         if (!input.data || !input.data[i] || (typeof input.data[i]) != arr2[index]) {
             let res = new response_1.response(true, "uploadShipData", playerName, `no ${i} in input data or wrong type`, { input: input });
             return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, res);
         }
-    });
+    }
     //recheck cause ts
     if (!input.cause || !input.cause.roomID || !input.cause.playerID || !input.data || !input.data.playerID || !input.data.roomID || !input.data.shipData)
         throw new Error("CRITICAL SERVER FAILURE IN UPLOADSHIPDATA");
