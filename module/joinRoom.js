@@ -17,7 +17,7 @@ async function joinRoom(input, roomdb, eventdb) {
     let arr2 = ["string", "string"];
     arr.forEach((i, index) => {
         if (!input.data || !input.data[i] || (typeof input.data[i]) != arr2[index]) {
-            let res = new response_1.response(true, "uploadShipData", "unknown", `no ${i} in input data or wrong type`, { input: input });
+            let res = new response_1.response(true, "joinRoom", "unknown", `no ${i} in input data or wrong type`, { input: input });
             return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, res);
         }
     });
