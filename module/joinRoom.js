@@ -8,7 +8,7 @@ const response_1 = require("../utils/classes/response");
 const genericModInputVerifier_1 = __importDefault(require("../utils/func/genericModInputVerifier"));
 const gameObjects_1 = require("../utils/classes/gameObjects");
 async function joinRoom(input, roomdb, eventdb) {
-    let k = (0, genericModInputVerifier_1.default)(input, true, false);
+    let k = (0, genericModInputVerifier_1.default)(input, true, false, false);
     if (k.fail) {
         k.fixAndAppendData("joinRoom", `failed to validate input`, "unknown");
         return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, k);

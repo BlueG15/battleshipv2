@@ -9,7 +9,7 @@ const genericModInputVerifier_1 = __importDefault(require("../utils/func/generic
 const gameObjects_1 = require("../utils/classes/gameObjects");
 const playerInput_shipDataUpload_1 = require("../utils/classes/playerInput_shipDataUpload");
 async function uploadShipData(input, roomdb, eventdb) {
-    let k = (0, genericModInputVerifier_1.default)(input, true, true);
+    let k = (0, genericModInputVerifier_1.default)(input, true, true, true);
     let playerName = (input.cause && input.cause.name) ? input.cause.name : "unknown";
     if (k.fail) {
         k.fixAndAppendData("uploadShipData", "failed to validate input", playerName);

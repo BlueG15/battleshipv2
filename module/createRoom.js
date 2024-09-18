@@ -8,7 +8,7 @@ const response_1 = require("../utils/classes/response");
 const genericModInputVerifier_1 = __importDefault(require("../utils/func/genericModInputVerifier"));
 const gameObjects_1 = require("../utils/classes/gameObjects");
 async function createRoom(input, roomdb, eventdb) {
-    let k = (0, genericModInputVerifier_1.default)(input, true, false);
+    let k = (0, genericModInputVerifier_1.default)(input, true, false, false);
     if (k.fail) {
         k.fixAndAppendData("createRoom", `failed to validate input`, "unknown");
         return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, k);
@@ -18,7 +18,7 @@ async function createRoom(input, roomdb, eventdb) {
     arr.forEach((i, index) => {
         if (!input.data || !input.data[i] || (typeof input.data[i]) != arr2[index]) {
             let res = new response_1.response(true, "uploadShipData", "unknown", `no ${i} in input data or wrong type`, { input: input });
-            return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, k);
+            return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, res);
         }
     });
     if (!input.cause || !input.cause.playerID || !input.data || !input.data.name || !input.data.mode)
