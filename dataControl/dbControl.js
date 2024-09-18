@@ -22,12 +22,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.databaseController = void 0;
 const pg = __importStar(require("pg"));
 //only this file gets access to pg directly
 //if anything fails, protect/console.log in this file
 const response_1 = require("../utils/classes/response");
+const util_1 = __importDefault(require("util"));
 class databaseController {
     constructor() {
         //note: property name gets lowercased when fetched
@@ -44,7 +48,7 @@ class databaseController {
                 return res.rows;
             }
             catch (e) {
-                console.log(`executed query: \n ${text} \n with errors: \n ${e} \n`);
+                console.log(`executed query: \n ${text} \n with errors: \n ${util_1.default.format(e)} \n`);
                 return [];
             }
         };
@@ -62,7 +66,7 @@ class databaseController {
                 return res;
             }
             catch (e) {
-                console.log(`executed query: \n ${text} \n with errors: \n ${e} \n`);
+                console.log(`executed query: \n ${text} \n with errors: \n ${util_1.default.format(e)} \n`);
                 return [];
             }
         };
@@ -122,7 +126,7 @@ class databaseController {
             }
             catch (e) {
                 await client.query('ROLLBACK');
-                console.error(`executed query: \n ${text} \n with errors: \n ${e} \n`);
+                console.error(`executed query: \n ${text} \n with errors: \n ${util_1.default.format(e)} \n`);
                 return false;
             }
             finally {
@@ -176,7 +180,7 @@ class databaseController {
                 return new response_1.response(false, 'writeLog', userName, 'successfully write log', { "playerID": userID, "logPos": a.length, "fullQuery": q });
             }
             catch (err) {
-                return new response_1.response(true, "writeLog", userName, 'fail to write log for some reason', { "errStr": JSON.stringify(err) });
+                return new response_1.response(true, "writeLog", userName, 'fail to write log for some reason', { "errStr": util_1.default.format(err) });
             }
         };
         this.getAllLogs = async () => {

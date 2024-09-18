@@ -27,6 +27,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
+const util_1 = __importDefault(require("util"));
 const universalModuleInput_1 = require("./utils/classes/universalModuleInput");
 const universalModuleRes_1 = require("./utils/classes/universalModuleRes");
 const response_1 = require("./utils/classes/response");
@@ -94,7 +95,7 @@ async function main() {
                 return err;
             }
             return new response_1.response(true, e, "unknownPlayer", "cannot load module", {
-                fullError: err.toString()
+                fullError: util_1.default.format(err)
             });
         }
         let res = undefined;
@@ -103,7 +104,7 @@ async function main() {
         }
         catch (err) {
             return new response_1.response(true, e, "unknownPlayer", "cannot run module", {
-                fullError: err.toString()
+                fullError: util_1.default.format(err)
             });
         }
         return res;
