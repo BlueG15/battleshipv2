@@ -13,7 +13,7 @@ class roomController {
         this.roomIDLength = 6;
         this.maxRetriesPerLoop = 1000;
         this.maxLoop = 6;
-        this.allowedModes = [1];
+        this.allowedModes = [-1, 0, 1];
         this.db = db;
     }
     async dropRoomTable() {
@@ -191,7 +191,7 @@ class roomController {
             return new response_1.response(true, toDB.event + "_" + "createRoomAndInsertP1", p1.name, toDB.note, { exist: [toDB.data] });
         await this.db.insertRow("rooms", toDB.fields, toDB.values);
         //note to self: socket.send to playerID what this resolves
-        return new response_1.response(false, 'createRoom', p1.name, `player ${p1.name} successfully created new room with roomID = ${roomID}`, game.sanitizeSelf().p1Obj);
+        return new response_1.response(false, 'createRoom', p1.name, `player ${p1.name} successfully created new room with roomID = ${roomID}`, game.sanitizeSelf());
     }
     async insertPlayer2(roomID, p2) {
         let game = await this.getRoomData(roomID);
