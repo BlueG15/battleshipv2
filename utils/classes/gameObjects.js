@@ -271,7 +271,7 @@ class gameObj {
         return {
             roomID: this.roomID,
             spectatorCount: this.spectatorID.length,
-            mode: (this.mode || this.mode == 0) ? this.mode : undefined,
+            mode: (!this.mode && this.mode != 0) ? undefined : this.mode,
             p1Obj: (this.p1Obj) ? this.p1Obj.santizeSelf(this.roomID, true, this.readyState[0], this.timePerPlayer, this.timeBonus) : undefined,
             p2Obj: (this.p2Obj) ? this.p2Obj.santizeSelf(this.roomID, false, this.readyState[1], this.timePerPlayer, this.timeBonus) : undefined,
             turnCount: (_a = this.turnCount) !== null && _a !== void 0 ? _a : undefined,
