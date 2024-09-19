@@ -13,7 +13,7 @@ class roomController {
         this.roomIDLength = 6;
         this.maxRetriesPerLoop = 1000;
         this.maxLoop = 6;
-        this.allowedModes = [0];
+        this.allowedModes = [1];
         this.db = db;
     }
     async dropRoomTable() {
