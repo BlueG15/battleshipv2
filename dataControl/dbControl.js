@@ -44,7 +44,7 @@ class databaseController {
                 const start = Date.now();
                 const res = await this.pool.query(text, params);
                 const duration = Date.now() - start;
-                console.log('executed query', { text, duration }, JSON.stringify(res));
+                //console.log('executed query', { text, duration }, JSON.stringify(res))
                 return res.rows;
             }
             catch (e) {

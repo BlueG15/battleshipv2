@@ -236,7 +236,7 @@ class gameObj {
             p2shiprot: (p2shiprot.length) ? p2shipR : undefined
         };
     }
-    convertToDBinteractionData() {
+    convertToDBinteractionData(gameObjBefore) {
         let a = this.convertPreSQL();
         if (a instanceof response_1.response)
             return a;
@@ -246,10 +246,21 @@ class gameObj {
         };
         let index = 0;
         Object.keys(a).forEach((i) => {
+            var _a;
             let temp = i;
-            if (a[temp] || a[temp] == 0) {
-                res.fields[index] = i;
-                res.values[index] = utils_1.default.convertToPGValue(a[temp]);
+            if (gameObjBefore) {
+                let lhs = JSON.stringify(gameObjBefore[temp], null, 0);
+                let rhs = JSON.stringify(a[temp], null, 0);
+                if (lhs != rhs) {
+                    res.fields.push(temp);
+                    res.values.push(utils_1.default.convertToPGValue(a[temp]));
+                    index++;
+                }
+            }
+            else {
+                //use all values, even the empty ones
+                res.fields[index] = temp;
+                res.values[index] = utils_1.default.convertToPGValue((_a = a[temp]) !== null && _a !== void 0 ? _a : undefined);
                 index++;
             }
         });

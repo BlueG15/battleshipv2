@@ -216,13 +216,18 @@ class roomController {
             return new response_1.response(true, "insertSpectator", spectatorID, "room full", { roomID: roomID });
         }
         game.addSpectator(spectatorID);
-        let toDB = game.convertToDBinteractionData();
+        let before = game.convertPreSQL();
+        if (before instanceof response_1.response)
+            return new response_1.response(true, before.event + "_" + "insertSpectator", spectatorID, before.note, { roomID: roomID });
+        let toDB = game.convertToDBinteractionData(before);
         if (toDB instanceof response_1.response)
             return new response_1.response(true, toDB.event + "_" + "insertSpectator", spectatorID, toDB.note, { roomID: roomID });
         await this.db.updateTable("rooms", toDB.fields, toDB.values, 'roomid', roomID);
         return new response_1.response(false, "insertSpectator", spectatorID, `successfully insert spectator ${spectatorID} into room ${roomID}`, game.sanitizeSelf());
     }
     async removeFromRoom(roomID, playerID) {
+        //can have race condition sadly hmmmm
+        //i think its fixxed now, values only updates in the fields that differs since when its fetched
         let game = await this.getRoomData(roomID);
         if (!game)
             return new response_1.response(true, "removeFromRoom", playerID, "invalid roomID", { roomID: roomID });
@@ -230,9 +235,12 @@ class roomController {
         let k = game.getPlayerType(playerID);
         if (!k.playerType || !k.index)
             return new response_1.response(true, "removeFromRoom", playerID, "player NOT in room", (() => { let r = game.sanitizeSelf(); r.playerRemoved = 0; return r; })());
+        let before = game.convertPreSQL();
+        if (before instanceof response_1.response)
+            return new response_1.response(true, before.event + "_" + "removeSpectatorFromRoom", playerID, before.note, (() => { let r = game.sanitizeSelf(); r.playerRemoved = 0; return r; })());
         if (k.playerType == 'spectator') {
             game.spectatorID = game.spectatorID.filter(i => i != playerID);
-            let toDB = game.convertToDBinteractionData();
+            let toDB = game.convertToDBinteractionData(before);
             if (toDB instanceof response_1.response)
                 return new response_1.response(true, toDB.event + "_" + "removeSpectatorFromRoom", playerID, toDB.note, (() => { let r = game.sanitizeSelf(); r.playerRemoved = 0; return r; })());
             await this.db.updateTable('rooms', toDB.fields, toDB.values, 'roomid', roomID);
@@ -250,16 +258,20 @@ class roomController {
                     return new response_1.response(false, "removeFromRoom", playerID, `removed host - room gone`, (() => { let r = game.sanitizeSelf(); r.playerRemoved = 1; return r; })());
                 }
                 else {
-                    let toDB = game.convertToDBinteractionData();
+                    let toDB = game.convertToDBinteractionData(before);
                     if (toDB instanceof response_1.response)
                         return new response_1.response(true, toDB.event + "_" + "removeP1FromRoom", playerID, toDB.note, (() => { let r = game.sanitizeSelf(); r.playerRemoved = 0; return r; })());
                     await this.db.updateTable('rooms', toDB.fields, toDB.values, 'roomid', roomID);
-                    await this.db.setValuesNULL('rooms', ['p2obj'], 'roomid', roomID);
+                    //await this.db.setValuesNULL('rooms', ['p2obj'], 'roomid', roomID)
                     return new response_1.response(false, "removeFromRoom", playerID, `removed P1, transfered owndership`, (() => { let r = game.sanitizeSelf(); r.playerRemoved = 1; return r; })());
                 }
             }
             else {
-                await this.db.setValuesNULL('rooms', ['p2obj'], 'roomid', roomID);
+                game.p2Obj = null;
+                let toDB = game.convertToDBinteractionData(before);
+                if (toDB instanceof response_1.response)
+                    return new response_1.response(true, toDB.event + "_" + "removeP1FromRoom", playerID, toDB.note, (() => { let r = game.sanitizeSelf(); r.playerRemoved = 0; return r; })());
+                await this.db.updateTable('rooms', toDB.fields, toDB.values, 'roomid', roomID);
                 return new response_1.response(false, "removeFromRoom", playerID, `removed P2`, (() => { let r = game.sanitizeSelf(); r.playerRemoved = 2; return r; })());
             }
         }
@@ -271,14 +283,19 @@ class roomController {
             game[`p${playerNum}Obj`] = p;
             return new response_1.response(true, "updatePlayerObj", p.id, "invalid roomID", game.sanitizeSelf());
         }
+        let before = game.convertPreSQL();
+        if (before instanceof response_1.response)
+            return new response_1.response(true, "updatePlayerObj", p.id, "cannot convert to DB data", game.sanitizeSelf());
         game[`p${playerNum}Obj`] = p;
-        let toDB = game.convertToDBinteractionData();
+        let toDB = game.convertToDBinteractionData(before);
         if (toDB instanceof response_1.response)
             return new response_1.response(true, "updatePlayerObj", p.id, "cannot convert to DB data", game.sanitizeSelf());
         await this.db.updateTable('rooms', toDB.fields, toDB.values, 'roomid', roomID);
         return new response_1.response(true, "updatePlayerObj", p.id, `successfully update p${playerNum}Obj`, game.sanitizeSelf());
     }
     async overwriteGameObj(game) {
+        //dangerous method
+        //do not use, not reccomended
         let toDB = game.convertToDBinteractionData();
         if (toDB instanceof response_1.response)
             return new response_1.response(true, "overwriteGameObj", 'unknown', "cannot convert to DB data", game.sanitizeSelf());
