@@ -146,10 +146,11 @@ class cryptEngine {
                 if (temp >= this.dataKeys_ships.length)
                     return new response_1.response(true, "decrypt-module-arr", "unknown", "invalid ship type index after decrypt", { "input": a, "invalidIndex": temp, "convertedFromChunk": k[i] });
                 res.shipType = this.dataKeys_ships[temp];
+                continue;
             }
             if (temp >= this.dataKeys_modules.length)
                 return new response_1.response(true, "decrypt-module-arr", "unknown", "invalid module index after decrypt", { "input": a, "invalidIndex": temp, "convertedFromChunk": k[i] });
-            res.moduleNameArr[i] = this.dataKeys_modules[temp];
+            res.moduleNameArr.push(this.dataKeys_modules[temp]);
         }
         return res;
     }

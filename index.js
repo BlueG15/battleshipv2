@@ -174,7 +174,10 @@ async function main() {
                 }
                 case 2: {
                     //io.to(k.playerID).emit(input.event, output.sendToOther);
-                    await handleEmit(e, k.playerID, output.sendToOther);
+                    const t = k.roomData.p1id;
+                    if (!t)
+                        break;
+                    await handleEmit(e, t, output.sendToOther);
                     break;
                 }
                 default: break;

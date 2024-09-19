@@ -291,7 +291,7 @@ class roomController {
         if (toDB instanceof response_1.response)
             return new response_1.response(true, "updatePlayerObj", p.name, "cannot convert to DB data", game.sanitizeSelf());
         await this.db.updateTable('rooms', toDB.fields, toDB.values, 'roomid', roomID);
-        return new response_1.response(true, "updatePlayerObj", p.name, `successfully update p${playerNum}Obj`, game.sanitizeSelf());
+        return new response_1.response(false, "updatePlayerObj", p.name, `successfully update p${playerNum}Obj`, game.sanitizeSelf());
     }
     async overwriteGameObj(game) {
         //dangerous method
@@ -300,7 +300,7 @@ class roomController {
         if (toDB instanceof response_1.response)
             return new response_1.response(true, "overwriteGameObj", 'unknown', "cannot convert to DB data", game.sanitizeSelf());
         await this.db.updateTable('rooms', toDB.fields, toDB.values, 'roomid', game.roomID);
-        return new response_1.response(true, "overwriteGameObj", 'unknown', `successfully update gameObj`, game.sanitizeSelf());
+        return new response_1.response(false, "overwriteGameObj", 'unknown', `successfully update gameObj`, game.sanitizeSelf());
     }
 }
 exports.roomController = roomController;
