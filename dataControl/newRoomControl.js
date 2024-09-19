@@ -205,7 +205,7 @@ class roomController {
         if (toDB instanceof response_1.response)
             return new response_1.response(true, toDB.event + "_" + "insertP2", p2.name, toDB.note, { roomID: roomID });
         await this.db.updateTable("rooms", toDB.fields, toDB.values, 'roomid', roomID);
-        return new response_1.response(false, "insertP2", p2.name, `successfully insert player ${p2.name} into room ${roomID}`, game.sanitizeSelf().p2Obj);
+        return new response_1.response(false, "insertP2", p2.name, `successfully insert player ${p2.name} into room ${roomID}`, game.sanitizeSelf());
     }
     async insertSpectator(roomID, spectatorID) {
         let game = await this.getRoomData(roomID);
