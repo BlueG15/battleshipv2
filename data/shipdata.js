@@ -173,6 +173,14 @@ const defaultUnits = {
 };
 exports.defaultUnits = defaultUnits;
 const defaultShips = {
+    command_tower: {
+        id: "command_tower",
+        name: "Command Tower",
+        size: [1, 1],
+        fp: -1,
+        unitSlots: [["unit_blank"]],
+        weight: 1
+    },
     ship_small: {
         id: "ship_small",
         name: "Gunboat",

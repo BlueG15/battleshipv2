@@ -15,8 +15,8 @@ async function uploadShipData(input, roomdb, eventdb) {
         k.fixAndAppendData("uploadShipData", "failed to validate input", playerName);
         return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, k);
     }
-    let arr = ["roomID", "playerID", "shipData"];
-    let arr2 = ["string", "string", "object"];
+    let arr = ["roomID", "shipData"];
+    let arr2 = ["string", "object"];
     for (let index = 0; index < arr.length; index++) {
         let i = arr[index];
         if (!input.data || !input.data[i] || (typeof input.data[i]) != arr2[index]) {
@@ -25,7 +25,7 @@ async function uploadShipData(input, roomdb, eventdb) {
         }
     }
     //recheck cause ts
-    if (!input.cause || !input.cause.roomID || !input.cause.playerID || !input.data || !input.data.playerID || !input.data.roomID || !input.data.shipData)
+    if (!input.cause || !input.cause.roomID || !input.cause.playerID || !input.data || !input.data.roomID || !input.data.shipData)
         throw new Error("CRITICAL SERVER FAILURE IN UPLOADSHIPDATA");
     let parsed = [];
     input.data.shipData.forEach((i, index) => {
