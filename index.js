@@ -258,7 +258,7 @@ async function main() {
                 return;
             let x = await roomdb.removeFromRoom(playerData.roomID, socket.id);
             let emptyParam = new universalModuleInput_1.moduleInput(playerData, "disconnect", undefined);
-            let res = new universalModuleRes_1.moduleRes(`socket ${socket.id} disconnected`, undefined, undefined, x);
+            let res = new universalModuleRes_1.moduleRes(`socket ${socket.id} disconnected`, undefined, undefined, undefined, undefined, x);
             await handleModuleRes(emptyParam, res);
         });
         // https://socket.io/docs/v4/server-api/#socketonanycallback

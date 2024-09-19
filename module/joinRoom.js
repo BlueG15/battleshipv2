@@ -32,6 +32,7 @@ async function joinRoom(input, roomdb, eventdb) {
     }
     if (!final.data.roomID)
         throw new Error("CRITICAL SERVER FAILURE IN JOINROOM");
-    return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, final);
+    //welp i forgor to inform everyone when player leaves lol
+    return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, final, undefined, undefined, final, final);
 }
 exports.default = joinRoom;

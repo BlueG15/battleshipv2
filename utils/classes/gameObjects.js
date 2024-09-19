@@ -267,15 +267,15 @@ class gameObj {
         return res;
     }
     sanitizeSelf() {
-        var _a, _b, _c;
+        var _a, _b;
         return {
             roomID: this.roomID,
             spectatorCount: this.spectatorID.length,
-            mode: (_a = this.mode) !== null && _a !== void 0 ? _a : undefined,
+            mode: (this.mode || this.mode == 0) ? this.mode : undefined,
             p1Obj: (this.p1Obj) ? this.p1Obj.santizeSelf(this.roomID, true, this.readyState[0], this.timePerPlayer, this.timeBonus) : undefined,
             p2Obj: (this.p2Obj) ? this.p2Obj.santizeSelf(this.roomID, false, this.readyState[1], this.timePerPlayer, this.timeBonus) : undefined,
-            turnCount: (_b = this.turnCount) !== null && _b !== void 0 ? _b : undefined,
-            phase: (_c = this.phase) !== null && _c !== void 0 ? _c : undefined
+            turnCount: (_a = this.turnCount) !== null && _a !== void 0 ? _a : undefined,
+            phase: (_b = this.phase) !== null && _b !== void 0 ? _b : undefined
         };
     }
     isSpectatorFull() {
