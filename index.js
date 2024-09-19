@@ -110,21 +110,48 @@ async function main() {
         }
         return res;
     }
+    async function handleEmit(event, toWhere, emitWhat) {
+        try {
+            io.to(toWhere).emit(event, emitWhat);
+            return;
+        }
+        catch (err) {
+            event += "-return";
+            try {
+                io.to(toWhere).emit(event, emitWhat);
+                return;
+            }
+            catch (err) {
+                await db.writeLog("handleEmit", "unknown", "unknown", "unknown", `CRITICAL SERVER FAILURE - cannot emit, data : ${util_1.default.format({
+                    event: event,
+                    toWhere: toWhere,
+                    emitWhat: util_1.default.format(emitWhat),
+                    fullError: util_1.default.format(err)
+                })}`);
+            }
+        }
+    }
     async function handleModuleRes(input, output) {
+        //to do: fix the bug where input.event is not emittable
+        //like "disconnect"
+        //fixxed, allocate all emits to handleEmit function
         var _a, _b, _c, _d;
+        let e = (_a = output.eventOveride) !== null && _a !== void 0 ? _a : input.event;
+        if (!e) {
+            await db.writeLog("handleModuleRes", "unknown", "unknown", "unknown", `CRITICAL SERVER FAILURE - input.event is somehow empty}`);
+            return;
+        }
         let k = input.cause;
         if (!k)
             k = {};
         if (output.serverLog) {
-            await db.writeLog("moduleLog", (_a = k.roomID) !== null && _a !== void 0 ? _a : undefined, (_b = k.playerID) !== null && _b !== void 0 ? _b : undefined, (_c = k.name) !== null && _c !== void 0 ? _c : undefined, JSON.stringify(output.serverLog));
+            await db.writeLog("moduleLog", (_b = k.roomID) !== null && _b !== void 0 ? _b : undefined, (_c = k.playerID) !== null && _c !== void 0 ? _c : undefined, (_d = k.name) !== null && _d !== void 0 ? _d : undefined, JSON.stringify(output.serverLog));
         }
         if (!k.playerID)
             return;
         if (output.sendToCauseIgnoreCheck) {
-            let e = (_d = output.eventOveride) !== null && _d !== void 0 ? _d : input.event;
-            if (e) {
-                io.to(k.playerID).emit(e, output.sendToCauseIgnoreCheck);
-            }
+            //io.to(k.playerID).emit(e  , output.sendToCauseIgnoreCheck)
+            await handleEmit(e, k.playerID, output.sendToCauseIgnoreCheck);
         }
         //check if player is in anyroom at all
         //ignore check means ignore this check
@@ -132,7 +159,8 @@ async function main() {
             return;
         //relative sends
         if (output.sendToCause) {
-            io.to(k.playerID).emit(input.event, output.sendToCause);
+            //io.to(k.playerID).emit(input.event, output.sendToCause);
+            await handleEmit(e, k.playerID, output.sendToCause);
         }
         if (output.sendToOther) {
             switch (k.player) {
@@ -140,57 +168,65 @@ async function main() {
                     const t = k.roomData.p2id;
                     if (!t)
                         break;
-                    io.to(t).emit(input.event, output.sendToOther);
+                    //io.to(t).emit(input.event, output.sendToOther);
+                    await handleEmit(e, t, output.sendToOther);
                     break;
                 }
                 case 2: {
-                    io.to(k.playerID).emit(input.event, output.sendToOther);
+                    //io.to(k.playerID).emit(input.event, output.sendToOther);
+                    await handleEmit(e, k.playerID, output.sendToOther);
                     break;
                 }
                 default: break;
             }
         }
         //not relative sends
-        //gosh this looks terrible
-        //but like, this is very easy to explain what the code does
+        //rewritten to be less terrible
+        for (let i = 1; i <= 4; i = i + 1) {
+            let pxID = k.roomData[`p${i}id`];
+            if (pxID) {
+                if (output[`sendToP${i}`]) //io.to(pxID).emit(input.event, output.sendToP1);
+                    await handleEmit(e, pxID, output[`sendToP${i}`]);
+                if (output.sendToPlayers && (i == 1 || i == 2)) //io.to(pxID).emit(input.event, output.sendToPlayers);
+                    await handleEmit(e, pxID, output.sendToPlayers);
+                if (output.sendToSpectators && (i == 3 || i == 4)) //io.to(p3id).emit(input.event, output.sendToPlayers);
+                    await handleEmit(e, pxID, output.sendToSpectators);
+                if (output.sendToAll) //io.to(pxID).emit(input.event, output.sendToAll);
+                    await handleEmit(e, pxID, output.sendToAll);
+            }
+        }
+        /*
         const [p1id, p2id, p3id, p4id] = [
-            k.roomData.p1id,
-            k.roomData.p2id,
-            k.roomData.p3id,
-            k.roomData.p4id
+          k.roomData.p1id,
+          k.roomData.p2id,
+          k.roomData.p3id,
+          k.roomData.p4id
         ];
+    
         if (p1id) {
-            if (output.sendToP1)
-                io.to(p1id).emit(input.event, output.sendToP1);
-            if (output.sendToPlayers)
-                io.to(p1id).emit(input.event, output.sendToPlayers);
-            if (output.sendToAll)
-                io.to(p1id).emit(input.event, output.sendToAll);
+          if (output.sendToP1)          io.to(p1id).emit(input.event, output.sendToP1);
+          if (output.sendToPlayers)     io.to(p1id).emit(input.event, output.sendToPlayers);
+          if (output.sendToAll)         io.to(p1id).emit(input.event, output.sendToAll);
         }
+    
         if (p2id) {
-            if (output.sendToP2)
-                io.to(p2id).emit(input.event, output.sendToP2);
-            if (output.sendToPlayers)
-                io.to(p2id).emit(input.event, output.sendToPlayers);
-            if (output.sendToAll)
-                io.to(p2id).emit(input.event, output.sendToAll);
+          if (output.sendToP2)          io.to(p2id).emit(input.event, output.sendToP2);
+          if (output.sendToPlayers)     io.to(p2id).emit(input.event, output.sendToPlayers);
+          if (output.sendToAll)         io.to(p2id).emit(input.event, output.sendToAll);
         }
+    
         if (p3id) {
-            if (output.sendToP3)
-                io.to(p3id).emit(input.event, output.sendToP3);
-            if (output.sendToSpectators)
-                io.to(p3id).emit(input.event, output.sendToPlayers);
-            if (output.sendToAll)
-                io.to(p3id).emit(input.event, output.sendToAll);
+          if (output.sendToP3)          io.to(p3id).emit(input.event, output.sendToP3);
+          if (output.sendToSpectators)  io.to(p3id).emit(input.event, output.sendToPlayers);
+          if (output.sendToAll)         io.to(p3id).emit(input.event, output.sendToAll);
         }
+    
         if (p4id) {
-            if (output.sendToP4)
-                io.to(p4id).emit(input.event, output.sendToP4);
-            if (output.sendToSpectators)
-                io.to(p4id).emit(input.event, output.sendToPlayers);
-            if (output.sendToAll)
-                io.to(p4id).emit(input.event, output.sendToAll);
+          if (output.sendToP4)          io.to(p4id).emit(input.event, output.sendToP4);
+          if (output.sendToSpectators)  io.to(p4id).emit(input.event, output.sendToPlayers);
+          if (output.sendToAll)         io.to(p4id).emit(input.event, output.sendToAll);
         }
+        */
     }
     async function intervalLoop() {
         let eArr = eventdb.incrementTime();
