@@ -39,7 +39,7 @@ const newRoomControl_1 = require("./dataControl/newRoomControl");
 const eventControl_1 = require("./eventSystem/eventControl");
 //initialization code, server startup and whatnot
 //note to self: change allowEvents array to also be dynamic through fs readDirSync
-const allowEvents = ["ping", "pingStop", "createRoom", "joinRoom", "uploadShipData"];
+const allowEvents = ["ping", "pingStop", "createRoom", "joinRoom", "uploadShipData", "chat", "updateGameMetaData"];
 const spectatorEvents = [];
 const testEvents = ["ping", "pingStop", "createRoom", "joinRoom"];
 const http_1 = require("http");
@@ -255,14 +255,15 @@ async function main() {
     io.on("connection", async (socket) => {
         db.writeLog('general', 'noRoom', socket.id, 'unknownUser', 'new socket connected');
         socket.on("disconnect", async (reason) => {
-            eventdb.removeAllEventsAddedByAPlayer(socket.id);
             let playerData = await roomdb.getRoomOfUserFromID(socket.id);
-            if (!playerData || !playerData.roomID)
+            if (!playerData)
                 return;
-            let x = await roomdb.removeFromRoom(playerData.roomID, socket.id);
-            let emptyParam = new universalModuleInput_1.moduleInput(playerData, "disconnect", undefined);
-            let res = new universalModuleRes_1.moduleRes(`socket ${socket.id} disconnected`, undefined, undefined, undefined, undefined, x);
-            await handleModuleRes(emptyParam, res);
+            let input = new universalModuleInput_1.moduleInput(playerData, 'disconnect');
+            let load = await loadModule('disconnect', input);
+            if (load instanceof response_1.response) {
+                return;
+            }
+            await handleModuleRes(input, load);
         });
         // https://socket.io/docs/v4/server-api/#socketonanycallback
         socket.onAny(async (event, ...args) => {

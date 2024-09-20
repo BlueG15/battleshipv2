@@ -15,8 +15,8 @@ async function uploadShipData(input, roomdb, eventdb) {
         k.fixAndAppendData("uploadShipData", "failed to validate input", playerName);
         return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, k);
     }
-    let arr = ["roomID", "shipData"];
-    let arr2 = ["string", "object"];
+    let arr = ["shipData"];
+    let arr2 = ["object"];
     for (let index = 0; index < arr.length; index++) {
         let i = arr[index];
         if (!input.data || !input.data[i] || (typeof input.data[i]) != arr2[index]) {
@@ -25,7 +25,7 @@ async function uploadShipData(input, roomdb, eventdb) {
         }
     }
     //recheck cause ts
-    if (!input.cause || !input.cause.roomID || !input.cause.playerID || !input.data || !input.data.roomID || !input.data.shipData)
+    if (!input.cause || !input.cause.roomID || !input.cause.playerID || !input.data || !input.data.shipData)
         throw new Error("CRITICAL SERVER FAILURE IN UPLOADSHIPDATA");
     let parsed = [];
     input.data.shipData.forEach((i, index) => {
@@ -49,8 +49,10 @@ async function uploadShipData(input, roomdb, eventdb) {
         final.fixAndAppendData("uploadShipData", ``, playerName);
         return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, final);
     }
-    let res1 = new response_1.response(false, "uploadShipData", playerName, "successfully uploaded shipData", { player: input.cause.player });
+    if (final.data.p1Obj && final.data.p1Obj.shipObjArray)
+        final.data.p1Obj.shipObjArray = undefined;
+    let res1 = new response_1.response(false, "uploadShipData", playerName, "successfully uploaded shipData", final.data);
     let res2 = new response_1.response(false, "uploadShipData", playerName, `player ${playerName} updated shipData`, { player: input.cause.player });
-    return new universalModuleRes_1.moduleRes(undefined, undefined, res1, res2);
+    return new universalModuleRes_1.moduleRes(undefined, undefined, res1, res2, undefined, undefined, undefined, res2);
 }
 exports.default = uploadShipData;

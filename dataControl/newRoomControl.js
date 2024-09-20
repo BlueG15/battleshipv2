@@ -14,6 +14,7 @@ class roomController {
         this.maxRetriesPerLoop = 1000;
         this.maxLoop = 6;
         this.allowedModes = [-1, 0, 1];
+        this.minTimePerPlayer = 100;
         this.db = db;
     }
     async dropRoomTable() {
@@ -292,6 +293,54 @@ class roomController {
             return new response_1.response(true, "updatePlayerObj", p.name, "cannot convert to DB data", game.sanitizeSelf());
         await this.db.updateTable('rooms', toDB.fields, toDB.values, 'roomid', roomID);
         return new response_1.response(false, "updatePlayerObj", p.name, `successfully update p${playerNum}Obj`, game.sanitizeSelf());
+    }
+    async updateGameMetaData(roomID, playerName, timePerPlayer, timeBonus) {
+        if ((!timePerPlayer || timePerPlayer <= this.minTimePerPlayer) && (!timeBonus)) {
+            let game = new gameObjects_1.gameObj(roomID);
+            return new response_1.response(true, "updateGameMetaData", playerName, "invalid input", game.sanitizeSelf());
+        }
+        let game = await this.getRoomData(roomID);
+        if (!game) {
+            let game = new gameObjects_1.gameObj(roomID);
+            return new response_1.response(true, "updateGameMetaData", playerName, "invalid roomID", game.sanitizeSelf());
+        }
+        let before = game.convertPreSQL();
+        if (before instanceof response_1.response)
+            return new response_1.response(true, "updateGameMetaData", playerName, "cannot convert to DB data", game.sanitizeSelf());
+        if (timeBonus)
+            game.timeBonus = timeBonus;
+        if (timePerPlayer)
+            game.timePerPlayer = timePerPlayer;
+        let toDB = game.convertToDBinteractionData(before);
+        if (toDB instanceof response_1.response)
+            return new response_1.response(true, "updateGameMetaData", playerName, "cannot convert to DB data", game.sanitizeSelf());
+        await this.db.updateTable('rooms', toDB.fields, toDB.values, 'roomid', roomID);
+        return new response_1.response(false, "updateGameMetaData", playerName, `successfully updated roomMetaData`, game.sanitizeSelf());
+    }
+    async togglePlayerReady(roomID, playerName, playerNum) {
+        switch (playerNum) {
+            case 1:
+            case 2: {
+                let game = await this.getRoomData(roomID);
+                if (!game) {
+                    let game = new gameObjects_1.gameObj(roomID);
+                    return new response_1.response(true, "togglePlayerReady", playerName, "invalid roomID", game.sanitizeSelf());
+                }
+                let before = game.convertPreSQL();
+                if (before instanceof response_1.response)
+                    return new response_1.response(true, "togglePlayerReady", playerName, "cannot convert to DB data", game.sanitizeSelf());
+                game.toggleReady(playerNum);
+                let toDB = game.convertToDBinteractionData(before);
+                if (toDB instanceof response_1.response)
+                    return new response_1.response(true, "togglePlayerReady", playerName, "cannot convert to DB data", game.sanitizeSelf());
+                await this.db.updateTable('rooms', toDB.fields, toDB.values, 'roomid', roomID);
+                return new response_1.response(false, "togglePlayerReady", playerName, `successfully toggled ready player ${playerName} to ${game.readyState[playerNum - 1]}`, game.sanitizeSelf());
+            }
+            default: {
+                let game = new gameObjects_1.gameObj(roomID);
+                return new response_1.response(true, "togglePlayerReady", playerName, "invalid player number", game.sanitizeSelf());
+            }
+        }
     }
     async overwriteGameObj(game) {
         //dangerous method
