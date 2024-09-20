@@ -35,7 +35,7 @@ async function joinRoom(input, roomdb, eventdb) {
     let final2 = new response_1.response(false, final.event, final.player, final.note, JSON.parse(JSON.stringify(final.data)));
     if (final2.data.p1Obj && final2.data.p1Obj.shipObjArray)
         final2.data.p1Obj.shipObjArray = undefined;
-    //welp i forgor to inform everyone when player leaves lol
-    return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, final2, undefined, undefined, final, final);
+    //welp i forgor to inform everyone when player joins lol
+    return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, final2, final);
 }
 exports.default = joinRoom;
