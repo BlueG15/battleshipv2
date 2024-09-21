@@ -40,6 +40,7 @@ const eventControl_1 = require("./eventSystem/eventControl");
 //initialization code, server startup and whatnot
 //note to self: change allowEvents array to also be dynamic through fs readDirSync
 const allowEvents = ["ping", "pingStop", "createRoom", "joinRoom", "uploadShipData", "chat", "updateGameMetaData"];
+const reloadRoomDataEvents = ['joinAsSpectator', 'joinRoom'];
 const spectatorEvents = [];
 const testEvents = ["ping", "pingStop", "createRoom", "joinRoom"];
 const http_1 = require("http");
@@ -68,6 +69,9 @@ function testSpectatorEvents(e) {
 }
 function testTestEvent(e) {
     return testEvents.includes(e);
+}
+function doReloadRoomData(e) {
+    return reloadRoomDataEvents.includes(e);
 }
 function setUpExpressEndpoints() {
     express.get("/", (req, res) => {
@@ -132,10 +136,15 @@ async function main() {
         }
     }
     async function handleModuleRes(input, output) {
+        var _a, _b, _c, _d;
+        if (!input.cause || !input.cause.playerID || !input.event)
+            return;
+        if (doReloadRoomData(input.event)) {
+            input.cause = await roomdb.getRoomOfUserFromID(input.cause.playerID);
+        }
         //to do: fix the bug where input.event is not emittable
         //like "disconnect"
         //fixxed, allocate all emits to handleEmit function
-        var _a, _b, _c, _d;
         let e = (_a = output.eventOveride) !== null && _a !== void 0 ? _a : input.event;
         if (!e) {
             await db.writeLog("handleModuleRes", "unknown", "unknown", "unknown", `CRITICAL SERVER FAILURE - input.event is somehow empty}`);
@@ -204,9 +213,6 @@ async function main() {
                  {
                     await handleEmit(e, pxID, output.sendToAll);
                 }
-            }
-            else {
-                console.log(`handle mod res called, no id for player ${i}`);
             }
         }
         /*
@@ -315,6 +321,7 @@ async function main() {
                     return;
                 //is test event, execute
                 let res = await loadModule(event, param);
+                //refetched 
                 if (!res)
                     return;
                 if (res instanceof response_1.response) {
