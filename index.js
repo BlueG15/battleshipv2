@@ -39,10 +39,17 @@ const newRoomControl_1 = require("./dataControl/newRoomControl");
 const eventControl_1 = require("./eventSystem/eventControl");
 //initialization code, server startup and whatnot
 //note to self: change allowEvents array to also be dynamic through fs readDirSync
-const allowEvents = ["ping", "pingStop", "createRoom", "joinRoom", "uploadShipData", "chat", "updateGameMetaData"];
-const reloadRoomDataEvents = ['joinAsSpectator', 'joinRoom'];
-const spectatorEvents = [];
-const testEvents = ["ping", "pingStop", "createRoom", "joinRoom"];
+const allowEvents = [
+    "ping", "pingStop",
+    "createRoom", "joinRoom", "joinAsSpectator",
+    "setReady",
+    "uploadShipData", "updateGameMetaData",
+    "chat",
+    "getRoomData"
+];
+const reloadRoomDataEvents = ['joinAsSpectator', 'joinRoom']; //events that reload roomData in handle mod res
+const spectatorEvents = ["chat", "getRoomData"];
+const testEvents = ["ping", "pingStop", "createRoom", "joinRoom", "joinAsSpectator"]; //events that can be triggered without room
 const http_1 = require("http");
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
@@ -335,6 +342,10 @@ async function main() {
             ;
             if (testTestEvent(event))
                 return; //past this point cannot trigger test events
+            if (!playerData.player || ![1, 2, 3, 4].includes(playerData.player))
+                return;
+            if ((playerData.player == 3 || playerData.player == 4) && !testSpectatorEvents(event))
+                return;
             let k = await parseArgs(args);
             if (k instanceof universalModuleRes_1.moduleRes) {
                 await handleModuleRes(emptyParam, k);

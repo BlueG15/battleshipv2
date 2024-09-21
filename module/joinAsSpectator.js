@@ -30,6 +30,6 @@ async function joinAsSpectator(input, roomdb, eventdb) {
     }
     if (!final.data.roomID)
         throw new Error("CRITICAL SERVER FAILURE IN joinAsSpectator");
-    return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, final, final);
+    return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, undefined, final);
 }
 exports.default = joinAsSpectator;
