@@ -215,10 +215,10 @@ class roomController {
         if (game.isSpectatorFull()) {
             return new response_1.response(true, "insertSpectator", spectatorID, "room full", { roomID: roomID });
         }
-        game.addSpectator(spectatorID);
         let before = game.convertPreSQL();
         if (before instanceof response_1.response)
             return new response_1.response(true, before.event + "_" + "insertSpectator", spectatorID, before.note, { roomID: roomID });
+        game.addSpectator(spectatorID);
         let toDB = game.convertToDBinteractionData(before);
         if (toDB instanceof response_1.response)
             return new response_1.response(true, toDB.event + "_" + "insertSpectator", spectatorID, toDB.note, { roomID: roomID });

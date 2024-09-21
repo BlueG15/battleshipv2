@@ -42,7 +42,7 @@ const eventControl_1 = require("./eventSystem/eventControl");
 const allowEvents = [
     "ping", "pingStop",
     "createRoom", "joinRoom", "joinAsSpectator",
-    "setReady",
+    "toggleReady",
     "uploadShipData", "updateGameMetaData",
     "chat",
     "getRoomData"

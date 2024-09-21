@@ -233,12 +233,16 @@ class databaseController {
     }
     //all methods below are unsanitized, use at careful consideration
     async insertRow(tableName, fields, values) {
+        if (!fields.length || !values.length)
+            return;
         let str = `
             INSERT INTO ${tableName} (${fields.join(", ")}) 
             VALUES (${values.join(", ")});`;
         await this.query(str);
     }
     async updateTable(tableName, fields, values, primaryKeyName, primaryKeyValue) {
+        if (!fields.length || !values.length)
+            return;
         let tempStr = [];
         fields.forEach((i, index) => {
             tempStr.push(`${i} = ${values[index]}`);
@@ -257,6 +261,8 @@ class databaseController {
         return this.query(str);
     }
     async setValuesNULL(tableName, fields, primaryKeyName, primaryKeyValue) {
+        if (!fields.length)
+            return;
         let tempStr = [];
         fields.forEach((i) => {
             tempStr.push(`${i} = NULL`);
@@ -268,6 +274,8 @@ class databaseController {
         await this.query(str);
     }
     async addField(tableName, fields, types) {
+        if (!fields.length || !types.length)
+            return;
         let tempStr = [];
         fields.forEach((i, index) => {
             tempStr.push(`ADD COLUMN ${i} ${types[index]}`);
