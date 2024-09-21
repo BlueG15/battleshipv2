@@ -49,7 +49,8 @@ class databaseController {
             }
             catch (e) {
                 console.log(`executed query: \n ${text} \n with errors: \n ${util_1.default.format(e)} \n`);
-                return [];
+                throw new response_1.response(true, "query", "", `postgres cannot perform query`, { fullError: util_1.default.format(e) });
+                //return [] as any[][]
             }
         };
         //full query returns the full response, just in case you want to check uhh data types? idk
@@ -67,7 +68,8 @@ class databaseController {
             }
             catch (e) {
                 console.log(`executed query: \n ${text} \n with errors: \n ${util_1.default.format(e)} \n`);
-                return [];
+                throw new response_1.response(true, "query", "", `postgres cannot perform query`, { fullError: util_1.default.format(e) });
+                //return [] as unknown as pg.QueryArrayResult<any>
             }
         };
         //for multiple sqls in a row, see manual transactions: https://node-postgres.com/features/transactions

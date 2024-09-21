@@ -36,6 +36,6 @@ async function joinRoom(input, roomdb, eventdb) {
     if (final2.data.p1Obj && final2.data.p1Obj.shipObjArray)
         final2.data.p1Obj.shipObjArray = undefined;
     //welp i forgor to inform everyone when player joins lol
-    return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, final2, final);
+    return new universalModuleRes_1.moduleRes(undefined, undefined, undefined, undefined, final, final2, undefined, undefined, final2);
 }
 exports.default = joinRoom;

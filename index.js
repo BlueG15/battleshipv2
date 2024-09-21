@@ -189,13 +189,24 @@ async function main() {
             let pxID = k.roomData[`p${i}id`];
             if (pxID) {
                 if (output[`sendToP${i}`]) //io.to(pxID).emit(input.event, output.sendToP1);
+                 {
                     await handleEmit(e, pxID, output[`sendToP${i}`]);
+                }
                 if (output.sendToPlayers && (i == 1 || i == 2)) //io.to(pxID).emit(input.event, output.sendToPlayers);
+                 {
                     await handleEmit(e, pxID, output.sendToPlayers);
+                }
                 if (output.sendToSpectators && (i == 3 || i == 4)) //io.to(p3id).emit(input.event, output.sendToPlayers);
+                 {
                     await handleEmit(e, pxID, output.sendToSpectators);
+                }
                 if (output.sendToAll) //io.to(pxID).emit(input.event, output.sendToAll);
+                 {
                     await handleEmit(e, pxID, output.sendToAll);
+                }
+            }
+            else {
+                console.log(`handle mod res called, no id for player ${i}`);
             }
         }
         /*
