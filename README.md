@@ -98,7 +98,9 @@ interface joinRoomInputData {
 ```
 
 Output :
+```js
 response<gameObj>
+```
 
 ### joinAsSpectator
 
@@ -111,18 +113,19 @@ interface joinAsSpectatorInputData {
 ```
 
 Output :
+```js
 response<gameObj>
+```
 
 ### toggleReady
 
 Input : {}
 
 Output :
-response<T>
 
-T : 
 ```ts
-{
+response<T>
+class T{
   player: 1 | 2, 
   isReady : boolean
 }
@@ -139,8 +142,10 @@ interface uploadShipDataInputData {
 ```
 
 Outputs : 
+```ts
 for cause : response<gameObj>
 for others : response<{player : 1 | 2}>
+```
 
 ### updateGameMetaData 
 
@@ -153,7 +158,9 @@ interface updateGameMetaDataInputData {
 } 
 ```
 Output : 
+```ts
 response<gameObj>
+```
 
 ### chat
 
@@ -166,12 +173,9 @@ interface chatInputData {
 ```
 
 Output : 
-response<T>
-
-T:
-
 ```ts
-{
+response<T>
+class T {
   player : string, // playerName
   playerNum: 1 | 2 | 3 | 4, // 3 or 4 means spectator
   message : string 
@@ -180,10 +184,12 @@ T:
 
 ### getRoomData : 
 
-Input : {}
+Input : ```{}```
 
 Output : 
+```ts
 response<gameObj>
+```
 
 ### disconnect-return
 
