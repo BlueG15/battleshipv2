@@ -1,5 +1,10 @@
-# battleshipv2
-This is the code the battleship v2 server
+# Battleshipv2
+This is the code the battleship v2 server, a personal project, feel free to folk and report bugs
+Featuring:
+
++ generalized socket management
++ generalized event system
++ postgres implementation for permanent storage in case server go poof
 
 ## Definition of classes
 
@@ -196,3 +201,4 @@ interface removeFromRoomReturnFormat extends Partial<gameObj>{
 send an event to the server, listen to the exact same event back *
 (*) : exeption being the event "disconnect", which server sends to everyone "disconnect-return"
 
+link of server: "https://battleship-server-2-0.glitch.me/"
