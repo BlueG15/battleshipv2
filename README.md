@@ -84,7 +84,9 @@ interface createRoomInputData {
 ```
 
 Output :
+```ts
 response<gameObj>
+```
 
 ### joinRoom
 
@@ -98,7 +100,7 @@ interface joinRoomInputData {
 ```
 
 Output :
-```js
+```ts
 response<gameObj>
 ```
 
